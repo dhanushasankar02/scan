@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ScanDine | Request a Demo</title>
+  <link rel="icon" type="image/svg+xml" href="images/favicon.svg">
+  <link rel="icon" type="image/png" href="images/favicon.png">
+  <link rel="shortcut icon" href="favicon.ico">
+  <link rel="apple-touch-icon" href="images/favicon.png">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  
+  <style>
+    /* ----- GLOBAL RESET & VARIABLES (Identical) ----- */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --navbar-bg: #ffffff; --footer-bg: #f8fafc; --navbar-shadow: 0 4px 20px rgba(0,0,0,0.05);
+      --text-primary: #1e1e2f; --text-secondary: #4a4a6a; --accent: #f97316; --accent-hover: #ea580c;
+      --dropdown-bg: #ffffff; --dropdown-shadow: 0 10px 25px -5px rgba(0,0,0,0.1); --border-light: #e9e9f0;
+      --icon-color: #4a4a6a; --transition: all 0.2s ease; --surface-color: #ffffff; --surface-alt: #f1f5f9;
+    }
+    html[data-theme="dark"] {
+      --navbar-bg: #12121c; --footer-bg: #0f0f16; --navbar-shadow: 0 4px 20px rgba(0,0,0,0.4);
+      --text-primary: #f0f0f5; --text-secondary: #b0b0c0; --accent: #fb923c; --accent-hover: #f97316;
+      --dropdown-bg: #1e1e2c; --dropdown-shadow: 0 10px 25px -5px rgba(0,0,0,0.6); --border-light: #2a2a3a;
+      --icon-color: #c0c0d0; --surface-color: #1e1e2c; --surface-alt: #12121c;
+    }
+    body {
+      font-family: system-ui, -apple-system, sans-serif; background-color: #f8fafc; color: var(--text-primary);
+      transition: background-color 0.3s, color 0.3s; display: flex; flex-direction: column; min-height: 100vh; overflow-x: hidden;
+    }
+    html[data-theme="dark"] body { background-color: #0b0b12; }
+    main { flex: 1; }
+
+    /* ----- NAVBAR CSS (Identical) ----- */
+    .navbar { background: var(--navbar-bg); box-shadow: var(--navbar-shadow); padding: 0.75rem 2rem; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 1000; transition: background 0.2s, box-shadow 0.2s; flex-wrap: wrap; }
+    .navbar__brand { font-size: 1.6rem; font-weight: 800; letter-spacing: -0.02em; color: var(--text-primary); text-decoration: none; display: flex; align-items: center; }
+    .navbar__brand span { color: var(--accent); }
+    .navbar__menu { display: flex; align-items: center; list-style: none; gap: 1.75rem; margin: 0; padding: 0; }
+    .navbar__item { position: relative; display: flex; align-items: center; height: 100%; }
+    .navbar__link { text-decoration: none; color: var(--text-primary); font-weight: 500; font-size: 0.95rem; display: flex; align-items: center; gap: 0.3rem; padding: 0.5rem 0; transition: var(--transition); border-bottom: 2px solid transparent; }
+    .navbar__link:hover, .navbar__link.is-active { color: var(--accent); border-bottom-color: var(--accent); }
+    .navbar__link i { font-size: 0.7rem; color: var(--text-secondary); transition: transform 0.2s; }
+    .navbar__link.is-active i { color: var(--accent); }
+    .navbar__item:hover .navbar__link i { transform: rotate(180deg); }
+    .navbar__link--login { background-color: var(--accent); color: #ffffff !important; padding: 0.5rem 1.25rem !important; border-radius: 0.5rem; border-bottom: none !important; font-weight: 600; transition: var(--transition); }
+    .navbar__link--login:hover { background-color: var(--accent-hover); color: #ffffff !important; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3); }
+    .dropdown { position: absolute; top: 100%; left: 0; min-width: 200px; background: var(--dropdown-bg); border-radius: 0.75rem; box-shadow: var(--dropdown-shadow); padding: 0.5rem 0; opacity: 0; visibility: hidden; transform: translateY(8px); transition: all 0.2s ease; border: 1px solid var(--border-light); z-index: 100; list-style: none; }
+    .navbar__item:hover .dropdown { opacity: 1; visibility: visible; transform: translateY(0); }
+    .dropdown li a { display: block; padding: 0.5rem 1.25rem; text-decoration: none; color: var(--text-primary); font-size: 0.9rem; transition: background 0.15s; }
+    .dropdown li a:hover { background: var(--border-light); color: var(--accent); }
+    .navbar__icons { display: flex; align-items: center; gap: 1rem; }
+    .icon-btn { background: transparent; border: none; font-size: 1.15rem; color: var(--icon-color); cursor: pointer; padding: 0.4rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: var(--transition); width: 2.2rem; height: 2.2rem; }
+    .icon-btn:hover { background: var(--border-light); color: var(--accent); }
+    .hamburger { display: none; background: transparent; border: none; font-size: 1.5rem; color: var(--text-primary); cursor: pointer; padding: 0.4rem; border-radius: 0.5rem; transition: var(--transition); }
+    .hamburger:hover { background: var(--border-light); }
+    .mobile-menu { display: none; width: 100%; background: var(--navbar-bg); padding: 1rem 0; border-top: 1px solid var(--border-light); transition: all 0.25s ease; }
+    .mobile-menu.active { display: block; }
+    .mobile-menu__list { list-style: none; display: flex; flex-direction: column; gap: 0.2rem; padding: 0 1rem; }
+    .mobile-menu__link { display: flex; align-items: center; justify-content: space-between; padding: 0.75rem 1rem; text-decoration: none; color: var(--text-primary); font-weight: 500; border-radius: 0.5rem; transition: background 0.15s; }
+    .mobile-menu__link:hover, .mobile-menu__link.is-active { background: var(--border-light); color: var(--accent); }
+    .mobile-menu__link i { font-size: 0.75rem; transition: transform 0.2s; }
+    .mobile-menu__link--login { background-color: var(--accent); color: #ffffff !important; justify-content: center; margin: 0.5rem 1rem; padding: 0.8rem; font-weight: 600; }
+    .mobile-menu__link--login:hover { background-color: var(--accent-hover); color: #ffffff !important; }
+    .mobile-submenu { list-style: none; padding-left: 1.5rem; max-height: 0; overflow: hidden; transition: max-height 0.25s ease; }
+    .mobile-submenu.open { max-height: 300px; }
+    .mobile-submenu li a { display: block; padding: 0.5rem 1rem; text-decoration: none; color: var(--text-secondary); font-size: 0.9rem; border-radius: 0.4rem; }
+    .mobile-submenu li a:hover { background: var(--border-light); color: var(--accent); }
+    .mobile-preferences { display: flex; align-items: center; justify-content: flex-start; gap: 1.5rem; padding: 1rem 2rem; margin-top: 0.5rem; border-top: 1px solid var(--border-light); }
+    .mobile-pref-item { display: flex; align-items: center; gap: 0.5rem; color: var(--text-secondary); font-size: 0.9rem; font-weight: 500; cursor: pointer; }
+    .mobile-pref-item .icon-btn { width: 2rem; height: 2rem; font-size: 1.1rem; }
+    html[dir="rtl"] .dropdown { left: auto; right: 0; }
+    html[dir="rtl"] .mobile-submenu { padding-left: 0; padding-right: 1.5rem; }
+    html[dir="rtl"] .mobile-preferences { flex-direction: row-reverse; justify-content: flex-end; }
+    @media screen and (max-width: 992px) {
+      .navbar { padding: 0.75rem 1.25rem; } .navbar__menu { display: none; } .navbar__icons .desktop-only { display: none; } .hamburger { display: flex; }
+      .mobile-menu { display: flex; flex-direction: column; position: fixed; top: 0; right: 0; left: auto; width: min(320px, 85vw); height: 100vh; height: 100dvh; padding: 1.25rem 0 2rem; border-top: none; border-left: 1px solid var(--border-light); box-shadow: -12px 0 36px rgba(0, 0, 0, 0.25); z-index: 1200; overflow-y: auto; transform: translateX(100%); visibility: hidden; transition: transform 0.28s ease, visibility 0.28s ease; }
+      .mobile-menu.active { display: flex; transform: translateX(0); visibility: visible; }
+      .mobile-drawer-header { display: flex; align-items: center; justify-content: space-between; padding: 0 1.25rem 1rem; margin-bottom: 0.75rem; border-bottom: 1px solid var(--border-light); }
+      .mobile-drawer-close { background: transparent; border: none; font-size: 1.35rem; color: var(--text-primary); cursor: pointer; padding: 0.35rem 0.55rem; border-radius: 0.5rem; transition: var(--transition); }
+      .mobile-drawer-close:hover { background: var(--border-light); color: var(--accent); }
+      .mobile-backdrop { display: none; position: fixed; inset: 0; background: rgba(10, 10, 18, 0.55); backdrop-filter: blur(2px); z-index: 1150; }
+      .mobile-backdrop.active { display: block; }
+    }
+
+    /* ----- FOOTER CSS (Identical) ----- */
+    .footer { background-color: var(--footer-bg); border-top: 1px solid var(--border-light); padding: 4rem 2rem 2rem; color: var(--text-secondary); transition: background-color 0.2s, border-color 0.2s; }
+    .footer__container { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 2fr 1fr 1fr 1.5fr; gap: 3rem; }
+    .footer__col h3 { color: var(--text-primary); font-size: 1.1rem; font-weight: 600; margin-bottom: 1.5rem; }
+    .footer__brand { font-size: 1.6rem; font-weight: 800; color: var(--text-primary); text-decoration: none; display: inline-block; margin-bottom: 1rem; }
+    .footer__brand span { color: var(--accent); }
+    .footer__desc { font-size: 0.95rem; line-height: 1.6; margin-bottom: 1.5rem; max-width: 300px; }
+    .footer__socials { display: flex; gap: 0.75rem; }
+    .footer__socials a { display: flex; align-items: center; justify-content: center; width: 2.2rem; height: 2.2rem; border-radius: 50%; background: var(--navbar-bg); color: var(--text-primary); text-decoration: none; border: 1px solid var(--border-light); transition: var(--transition); }
+    .footer__socials a:hover { background: var(--accent); color: #fff; border-color: var(--accent); transform: translateY(-2px); }
+    .footer__links { list-style: none; display: flex; flex-direction: column; gap: 0.8rem; }
+    .footer__links a { text-decoration: none; color: var(--text-secondary); font-size: 0.95rem; transition: var(--transition); }
+    .footer__links a:hover { color: var(--accent); padding-left: 4px; }
+    html[dir="rtl"] .footer__links a:hover { padding-left: 0; padding-right: 4px; }
+    .footer__newsletter p { font-size: 0.95rem; line-height: 1.6; margin-bottom: 1rem; }
+    .footer__form { display: flex; gap: 0.5rem; }
+    .footer__form input { flex: 1; padding: 0.6rem 1rem; border-radius: 0.5rem; border: 1px solid var(--border-light); background: var(--navbar-bg); color: var(--text-primary); font-size: 0.9rem; outline: none; transition: var(--transition); }
+    .footer__form input:focus { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.2); }
+    .footer__form button { background: var(--accent); color: #fff; border: none; padding: 0.6rem 1rem; border-radius: 0.5rem; cursor: pointer; font-weight: 600; font-size: 0.9rem; transition: var(--transition); display: flex; align-items: center; justify-content: center; }
+    .footer__form button:hover { background: var(--accent-hover); }
+    .footer__bottom { max-width: 1200px; margin: 3rem auto 0; padding-top: 1.5rem; border-top: 1px solid var(--border-light); display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem; }
+    .footer__legal { display: flex; gap: 1.5rem; }
+    .footer__legal a { text-decoration: none; color: var(--text-secondary); transition: var(--transition); }
+    .footer__legal a:hover { color: var(--accent); }
+    @media screen and (max-width: 992px) { .footer__container { grid-template-columns: 1fr 1fr; gap: 2.5rem; } .footer__bottom { flex-direction: column; gap: 1rem; text-align: center; } }
+    @media screen and (max-width: 600px) { .footer__container { grid-template-columns: 1fr; } .footer__form { flex-direction: column; } .footer__legal { flex-wrap: wrap; justify-content: center; } }
+
+    /* =========================================
+       NEW UNIQUE DEMO PAGE SECTIONS
+       ========================================= */
+    .demo-wrap { padding: 0; max-width: 100%; position: relative; }
+    .sec-pad { padding: 8rem 2rem; max-width: 1200px; margin: 0 auto; position: relative; }
+    .heading-main { font-size: 3.5rem; font-weight: 800; margin-bottom: 1.5rem; letter-spacing: -0.04em; line-height: 1.1; }
+    .sub-main { font-size: 1.2rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 3rem; }
+
+    /* 1. SPLIT-SCREEN FORM & IMAGE */
+    .split-form-hero { display: grid; grid-template-columns: 1.05fr 0.95fr; gap: 3.5rem; align-items: center; max-width: 1240px; margin: 0 auto; padding: 3.5rem 2rem 4.5rem; }
+    .form-side { display: flex; flex-direction: column; justify-content: center; }
+    .form-side .heading-main { font-size: clamp(2.25rem, 4vw, 3.25rem); margin-bottom: 1rem; }
+    .form-side .sub-main { font-size: 1.1rem; margin-bottom: 2rem; }
+    .image-side { position: relative; overflow: hidden; border-radius: 1.75rem; height: 580px; border: 1px solid var(--border-light); box-shadow: 0 24px 48px -16px rgba(15, 23, 42, 0.16); background: var(--surface-alt); }
+    .image-side__img { width: 100%; height: 100%; object-fit: cover; object-position: center; display: block; }
+    
+    .split-form { display: flex; flex-direction: column; gap: 1.15rem; background: var(--surface-color); padding: 2rem; border-radius: 1.5rem; border: 1px solid var(--border-light); box-shadow: var(--navbar-shadow); }
+    .input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .form-field { display: flex; flex-direction: column; gap: 0.45rem; }
+    .form-field label { font-size: 0.88rem; font-weight: 600; color: var(--text-primary); }
+    .form-field input, .form-field select { padding: 0.9rem 1.05rem; border-radius: 0.85rem; border: 1.5px solid var(--border-light); background: var(--surface-alt); color: var(--text-primary); font-family: inherit; font-size: 0.96rem; outline: none; transition: border-color 0.2s, box-shadow 0.2s; }
+    .form-field input:focus, .form-field select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.14); }
+    .btn-submit { padding: 1rem 1.25rem; border-radius: 0.9rem; background: var(--accent); color: #fff; font-family: inherit; font-size: 1.05rem; font-weight: 700; border: none; cursor: pointer; transition: background 0.2s, transform 0.2s; margin-top: 0.5rem; }
+    .btn-submit:hover { background: var(--accent-hover); transform: translateY(-1px); }
+
+    /* 2. PROGRESS BAR & INTERACTIVE STEPS */
+    .progress-steps { background: var(--surface-alt); border-y: 1px solid var(--border-light); }
+    .progress-track { width: 100%; height: 6px; background: var(--border-light); border-radius: 3px; margin: 3rem 0; position: relative; }
+    .progress-fill { position: absolute; top: 0; left: 0; height: 100%; background: var(--accent); border-radius: 3px; width: 33%; }
+    .steps-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; }
+    .step-box { background: var(--navbar-bg); padding: 2.5rem; border-radius: 1.5rem; border: 1px solid var(--border-light); position: relative; }
+    .step-num { width: 40px; height: 40px; background: var(--accent); color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.2rem; margin-bottom: 1.5rem; }
+    .step-box h3 { font-size: 1.3rem; margin-bottom: 0.75rem; }
+    .step-box p { color: var(--text-secondary); font-size: 0.95rem; line-height: 1.6; }
+
+    /* 3. ASYMMETRICAL FAQ / Q&A GRID */
+    .faq-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: start; }
+    .faq-left h2 { font-size: 3rem; margin-bottom: 1rem; }
+    .faq-left p { color: var(--text-secondary); font-size: 1.1rem; line-height: 1.6; margin-bottom: 2rem; }
+    .faq-list { display: flex; flex-direction: column; gap: 1.5rem; }
+    .faq-box { background: var(--surface-color); padding: 2rem; border-radius: 1rem; border: 1px solid var(--border-light); }
+    .faq-box h4 { font-size: 1.2rem; margin-bottom: 0.75rem; display: flex; gap: 1rem; align-items: center; }
+    .faq-box h4 i { color: var(--accent); }
+    .faq-box p { color: var(--text-secondary); font-size: 0.95rem; line-height: 1.6; }
+
+    /* 4. HORIZONTAL FEATURE TAGS */
+    .tags-section { background: #12121c; border-radius: 2rem; padding: 4.5rem 3rem; text-align: center; border: 1px solid var(--border-light); position: relative; overflow: hidden; box-shadow: var(--navbar-shadow); }
+    .tags-section__img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0; }
+    .tags-section::after { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(12, 12, 20, 0.86) 0%, rgba(18, 18, 28, 0.78) 100%); z-index: 1; pointer-events: none; }
+    .tags-section .heading-main { color: #ffffff; position: relative; z-index: 2; }
+    .tags-section .sub-main { color: rgba(241, 245, 249, 0.88); position: relative; z-index: 2; margin-bottom: 2.5rem; }
+    .tags-container { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1rem; position: relative; z-index: 2; }
+    .feature-tag { background: rgba(255, 255, 255, 0.12); backdrop-filter: blur(10px); color: #ffffff; padding: 1rem 1.25rem; border-radius: 999px; font-weight: 600; font-size: 1rem; border: 1px solid rgba(255, 255, 255, 0.22); display: flex; align-items: center; justify-content: center; gap: 0.65rem; transition: var(--transition); }
+    .feature-tag:hover { background: rgba(249, 115, 22, 0.22); border-color: rgba(251, 146, 60, 0.6); transform: translateY(-2px); }
+    .feature-tag i { color: #fb923c; }
+
+    /* 5. FULL-WIDTH QUOTE WITH AVATAR */
+    .quote-section { text-align: center; max-width: 980px; margin: 0 auto; background: #12121c; border-radius: 2rem; padding: 4.5rem 3rem; border: 1px solid var(--border-light); box-shadow: var(--navbar-shadow); position: relative; overflow: hidden; }
+    .quote-section__img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0; }
+    .quote-section::after { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(12, 12, 20, 0.88) 0%, rgba(18, 18, 28, 0.78) 100%); z-index: 1; pointer-events: none; }
+    .quote-icon { font-size: 3.25rem; color: #fb923c; margin-bottom: 1.25rem; position: relative; z-index: 2; }
+    .quote-text { font-size: 2.15rem; font-weight: 700; line-height: 1.45; margin-bottom: 2.25rem; color: #ffffff; position: relative; z-index: 2; }
+    .quote-author { display: inline-flex; align-items: center; justify-content: center; gap: 1rem; position: relative; z-index: 2; background: rgba(255, 255, 255, 0.08); backdrop-filter: blur(8px); padding: 0.75rem 1.5rem 0.75rem 0.75rem; border-radius: 999px; border: 1px solid rgba(255, 255, 255, 0.16); }
+    .quote-author img { width: 56px; height: 56px; border-radius: 50%; object-fit: cover; border: 2px solid #fb923c; }
+    .quote-author h5 { font-size: 1.05rem; color: #ffffff; }
+    .quote-author span { color: rgba(241, 245, 249, 0.8); font-size: 0.88rem; }
+
+    /* 6. STATIC BACKGROUND IMAGE PARALLAX */
+    .static-parallax { background: url('images/demo-parallax.jpg') center/cover fixed no-repeat; padding: 8rem 2rem; text-align: center; position: relative; }
+    .static-parallax::before { content: ''; position: absolute; inset: 0; background: rgba(0,0,0,0.6); }
+    .sp-content { position: relative; z-index: 2; color: #fff; max-width: 800px; margin: 0 auto; }
+    .sp-content h2 { font-size: 3rem; margin-bottom: 1.5rem; }
+    .sp-content p { font-size: 1.2rem; opacity: 0.9; line-height: 1.6; }
+
+    /* 7. CENTERED CTA BANNER */
+    .minimal-cta { text-align: center; padding: 6rem 3rem; width: calc(100% - 4rem); max-width: 1136px; margin: 5rem auto; border-radius: 2rem; border: 1px solid var(--border-light); box-shadow: var(--navbar-shadow); position: relative; overflow: hidden; background: #12121c; }
+    .minimal-cta__img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center 28%; z-index: 0; }
+    .minimal-cta::after { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(12, 12, 20, 0.86) 0%, rgba(18, 18, 28, 0.74) 100%); z-index: 1; pointer-events: none; }
+    .minimal-cta h2 { font-size: 3rem; font-weight: 800; margin-bottom: 1rem; color: #ffffff; position: relative; z-index: 2; }
+    .minimal-cta p { font-size: 1.2rem; color: rgba(241, 245, 249, 0.9); margin-bottom: 2.25rem; position: relative; z-index: 2; }
+    .min-btn { background: var(--accent); color: #fff; padding: 1.15rem 2.75rem; border-radius: 0.75rem; font-weight: 700; text-decoration: none; font-size: 1.1rem; display: inline-block; transition: var(--transition); position: relative; z-index: 2; box-shadow: 0 10px 25px rgba(249, 115, 22, 0.35); }
+    .min-btn:hover { background: var(--accent-hover); color: #fff; transform: translateY(-2px); }
+
+    @media (max-width: 992px) {
+      .split-form-hero { grid-template-columns: 1fr; padding: 2.5rem 1.25rem 3.5rem; gap: 2rem; }
+      .image-side { height: 340px; border-radius: 1.35rem; }
+      .split-form { padding: 1.5rem; }
+      .input-row { grid-template-columns: 1fr; }
+      .steps-grid { grid-template-columns: 1fr; }
+      .faq-grid { grid-template-columns: 1fr; gap: 2rem; }
+      .tags-section { padding: 3rem 1.5rem; }
+      .tags-container { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .quote-text { font-size: 1.8rem; }
+      .sp-content h2 { font-size: 2rem; }
+      .minimal-cta h2 { font-size: 2rem; }
+    }
+    @media (max-width: 600px) {
+      .tags-container { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <!-- NAVBAR (UNTOUCHED) -->
+  <nav class="navbar">
+    <a href="index.html" class="navbar__brand">Scan<span>Dine</span></a>
+    <ul class="navbar__menu">
+      <li class="navbar__item"><a href="#" class="navbar__link">Home <i class="fas fa-chevron-down"></i></a><ul class="dropdown"><li><a href="index.html">Home1</a></li><li><a href="home2.html">Home2</a></li></ul></li>
+      <li class="navbar__item"><a href="features.html" class="navbar__link">Features</a></li>
+      <li class="navbar__item"><a href="pricing plans.html" class="navbar__link">Pricing Plans</a></li>
+      <li class="navbar__item"><a href="demo request.html" class="navbar__link is-active" aria-current="page">Demo Request</a></li>
+      <li class="navbar__item"><a href="contact.html" class="navbar__link">Contact</a></li>
+      <li class="navbar__item"><a href="#" class="navbar__link">Dashboard <i class="fas fa-chevron-down"></i></a><ul class="dropdown"><li><a href="user-dashboard.html">User Dashboard</a></li><li><a href="admin-dashboard.html">Admin Dashboard</a></li></ul></li>
+      <li class="navbar__item"><a href="login.html" class="navbar__link navbar__link--login">Login</a></li>
+    </ul>
+    <div class="navbar__icons">
+      <button class="icon-btn desktop-only" id="themeToggle"><i class="fas fa-moon" id="themeIcon"></i></button>
+      <button class="icon-btn desktop-only" id="rtlToggle"><i class="fas fa-arrow-right-arrow-left"></i></button>
+      <button class="hamburger" id="hamburgerBtn"><i class="fas fa-bars" id="hamburgerIcon"></i></button>
+    </div>
+    <div class="mobile-menu" id="mobileMenu">
+      <ul class="mobile-menu__list">
+        <li class="mobile-menu__item"><a href="#" class="mobile-menu__link" data-submenu="homeSub">Home <i class="fas fa-chevron-down"></i></a><ul class="mobile-submenu" id="homeSub"><li><a href="index.html">Home1</a></li><li><a href="home2.html">Home2</a></li></ul></li>
+        <li class="mobile-menu__item"><a href="features.html" class="mobile-menu__link">Features</a></li>
+        <li class="mobile-menu__item"><a href="pricing plans.html" class="mobile-menu__link">Pricing Plans</a></li>
+        <li class="mobile-menu__item"><a href="demo request.html" class="mobile-menu__link is-active" aria-current="page">Demo Request</a></li>
+        <li class="mobile-menu__item"><a href="contact.html" class="mobile-menu__link">Contact</a></li>
+        <li class="mobile-menu__item"><a href="#" class="mobile-menu__link" data-submenu="dashSub">Dashboard <i class="fas fa-chevron-down"></i></a><ul class="mobile-submenu" id="dashSub"><li><a href="user-dashboard.html">User Dashboard</a></li><li><a href="admin-dashboard.html">Admin Dashboard</a></li></ul></li>
+        <li class="mobile-menu__item"><a href="login.html" class="mobile-menu__link mobile-menu__link--login">Login</a></li>
+      </ul>
+      <div class="mobile-preferences">
+        <div class="mobile-pref-item" id="mobileThemeToggle"><button class="icon-btn"><i class="fas fa-moon" id="mobileThemeIcon"></i></button><span>Dark Mode</span></div>
+        <div class="mobile-pref-item" id="mobileRtlToggle"><button class="icon-btn"><i class="fas fa-arrow-right-arrow-left"></i></button><span>RTL / LTR</span></div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- MAIN CONTENT -->
+  <main class="demo-wrap">
+    
+    <!-- 1. SPLIT-SCREEN FORM & IMAGE -->
+    <section class="split-form-hero" id="split-form-sec">
+      <div class="form-side">
+        <h1 class="heading-main">Book Your Personalized Demo</h1>
+        <p class="sub-main">See exactly how ScanDine can streamline your operations and boost revenue. Fill out the form and our team will be in touch.</p>
+        
+        <form class="split-form" onsubmit="event.preventDefault(); alert('Demo booked! Check your email.');">
+          <div class="input-row">
+            <div class="form-field"><label>First Name</label><input type="text" placeholder="Elena" required></div>
+            <div class="form-field"><label>Last Name</label><input type="text" placeholder="Rodriguez" required></div>
+          </div>
+          <div class="form-field"><label>Work Email</label><input type="email" placeholder="elena@tapasyvino.com" required></div>
+          <div class="form-field"><label>Restaurant Name</label><input type="text" placeholder="Tapas &amp; Vino" required></div>
+          <div class="form-field">
+            <label>Restaurant Type</label>
+            <select>
+              <option>Cafe / Coffee Shop</option>
+              <option>Fine Dining</option>
+              <option>Quick Service (QSR)</option>
+              <option>Multi-Location Chain</option>
+            </select>
+          </div>
+          <button type="submit" class="btn-submit">Request Demo</button>
+        </form>
+      </div>
+      <div class="image-side">
+        <img src="images/demo-split-hero.jpg" alt="Restaurant owner and ScanDine specialist reviewing a QR menu and table floorplan tablet at a host stand" class="image-side__img">
+      </div>
+    </section>
+
+    <!-- 2. PROGRESS BAR & INTERACTIVE STEPS -->
+    <section class="progress-steps" id="progress-sec">
+      <div class="sec-pad">
+        <h2 class="heading-main" style="text-align: center;">How Your Demo Works</h2>
+        <p class="sub-main" style="text-align: center; margin: 0 auto 2rem;">A quick, 45-minute session tailored to your restaurant's needs.</p>
+        
+        <div class="progress-track"><div class="progress-fill" id="progFill"></div></div>
+        
+        <div class="steps-grid">
+          <div class="step-box">
+            <div class="step-num">1</div>
+            <h3>Discovery</h3>
+            <p>We ask about your current setup, table turnover, and what you want to improve.</p>
+          </div>
+          <div class="step-box">
+            <div class="step-num">2</div>
+            <h3>Walkthrough</h3>
+            <p>We show you the guest view, the kitchen view, and the admin dashboard live.</p>
+          </div>
+          <div class="step-box">
+            <div class="step-num">3</div>
+            <h3>Q&A</h3>
+            <p>We answer your technical questions and discuss which plan fits your volume.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. ASYMMETRICAL FAQ / Q&A GRID -->
+    <section class="sec-pad" id="faq-sec">
+      <div class="faq-grid">
+        <div class="faq-left">
+          <h2>Common Questions Before the Demo</h2>
+          <p>Don't worry if you don't have all the answers yet. That's what the demo is for. Here are a few things people usually ask us first.</p>
+          <img src="images/demo-faq-img.jpg" alt="Barista preparing espresso behind a busy modern cafe counter" style="width: 100%; border-radius: 1.5rem; margin-top: 2rem; border: 1px solid var(--border-light); object-fit: cover; max-height: 360px;">
+        </div>
+        <div class="faq-list">
+          <div class="faq-box">
+            <h4><i class="fas fa-clock"></i> How long does setup take?</h4>
+            <p>We can typically have your menu digitized and your QR codes printed within 24-48 hours of receiving your menu.</p>
+          </div>
+          <div class="faq-box">
+            <h4><i class="fas fa-credit-card"></i> Do I need special hardware?</h4>
+            <p>No. ScanDine runs entirely in the browser. Your guests use their own phones, and you can view the kitchen dashboard on any tablet or computer you already own.</p>
+          </div>
+          <div class="faq-box">
+            <h4><i class="fas fa-tools"></i> Can I integrate with my current POS?</h4>
+            <p>Yes! We integrate directly with Toast, Square, Clover, and many other major POS systems to sync your orders seamlessly.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. HORIZONTAL FEATURE TAGS -->
+    <section class="sec-pad" id="tags-sec">
+      <div class="tags-section">
+        <img src="images/demo-ecosystem-bg.jpg" alt="Restaurant server pouring wine for a guest at a warmly lit table" class="tags-section__img">
+        <h2 class="heading-main">Everything you'll see in the demo</h2>
+        <p class="sub-main">We'll show you the full ecosystem, including:</p>
+        <div class="tags-container">
+          <div class="feature-tag"><i class="fas fa-qrcode"></i> QR Code Generation</div>
+          <div class="feature-tag"><i class="fas fa-mobile-alt"></i> Mobile Menu UI</div>
+          <div class="feature-tag"><i class="fas fa-chart-line"></i> Live Analytics</div>
+          <div class="feature-tag"><i class="fas fa-utensils"></i> Kitchen Display System</div>
+          <div class="feature-tag"><i class="fas fa-credit-card"></i> Contactless Payments</div>
+          <div class="feature-tag"><i class="fas fa-language"></i> Multi-Language Menus</div>
+          <div class="feature-tag"><i class="fas fa-shield-alt"></i> Allergen Filtering</div>
+          <div class="feature-tag"><i class="fas fa-bolt"></i> Instant Table Sync</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. FULL-WIDTH QUOTE WITH AVATAR -->
+    <section class="sec-pad" id="quote-sec">
+      <div class="quote-section">
+        <img src="images/demo-quote-bg.jpg" alt="Classic bistro dining table with menus and glassware" class="quote-section__img">
+        <i class="fas fa-quote-left quote-icon"></i>
+        <h2 class="quote-text">"The demo completely sold us. Seeing how easily the orders flowed from the table to the kitchen screen made the decision a no-brainer."</h2>
+        <div class="quote-author">
+          <img src="images/demo-avatar-alessandro.jpg" alt="Chef Alessandro, Owner, Osteria Nova">
+          <div style="text-align: left;">
+            <h5>Chef Alessandro</h5>
+            <span>Owner, Osteria Nova</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6. STATIC BACKGROUND IMAGE PARALLAX -->
+    <section class="static-parallax" id="parallax-sec">
+      <div class="sp-content">
+        <h2>Join 500+ Restaurants Modernizing Their Service</h2>
+        <p>From busy cafes to Michelin-starred dining rooms, ScanDine is the trusted partner for digital ordering.</p>
+      </div>
+    </section>
+
+    <!-- 7. CENTERED CTA BANNER -->
+    <section class="minimal-cta" id="cta-sec">
+      <img src="images/demo-cta-bg.jpg" alt="Smiling cafe owner serving a drink across a warm wooden counter" class="minimal-cta__img">
+      <h2>Ready to see it for yourself?</h2>
+      <p>Schedule your 45-minute walkthrough today.</p>
+      <a href="#split-form-sec" class="min-btn">Book My Demo</a>
+    </section>
+
+  </main>
+
+  <!-- FOOTER (UNTOUCHED) -->
+  <footer class="footer">
+    <div class="footer__container">
+      <div class="footer__col">
+        <a href="#" class="footer__brand">Scan<span>Dine</span></a>
+        <p class="footer__desc">The ultimate QR code menu and contactless ordering system for modern restaurants.</p>
+        <div class="footer__socials"><a href="#"><i class="fab fa-twitter"></i></a><a href="#"><i class="fab fa-facebook-f"></i></a><a href="#"><i class="fab fa-instagram"></i></a></div>
+      </div>
+      <div class="footer__col"><h3>Product</h3><ul class="footer__links"><li><a href="features.html">Features</a></li><li><a href="pricing.html">Pricing Plans</a></li><li><a href="demo.html">Demo Request</a></li></ul></div>
+      <div class="footer__col"><h3>Support</h3><ul class="footer__links"><li><a href="#">Help Center</a></li><li><a href="contact.html">Contact Us</a></li><li><a href="#">Privacy Policy</a></li></ul></div>
+      <div class="footer__col footer__newsletter">
+        <h3>Stay Updated</h3><p>Subscribe to our newsletter.</p>
+        <form class="footer__form" onsubmit="event.preventDefault();"><input type="email" placeholder="Email address" required><button type="submit"><i class="fas fa-paper-plane"></i></button></form>
+      </div>
+    </div>
+    <div class="footer__bottom">
+      <p>&copy; 2023 ScanDine. All rights reserved.</p>
+      <div class="footer__legal"><a href="#">Privacy</a><a href="#">Terms</a><a href="#">Cookies</a></div>
+    </div>
+  </footer>
+
+  <!-- FRAMER MOTION SCRIPT -->
+  <script type="module">
+    import { animate, inView, scroll, stagger } from "https://cdn.jsdelivr.net/npm/framer-motion@11.0.8/dom/+esm";
+
+    // 1. SPLIT FORM: Unique Animation -> Slide from Left & Right
+    inView(".split-form-hero", (info) => {
+      if (info.target) {
+        animate(".form-side", { opacity: [0, 1], x: [-50, 0] }, { duration: 0.8, ease: "easeOut" });
+        animate(".image-side", { opacity: [0, 1], x: [50, 0] }, { duration: 0.8, ease: "easeOut" });
+      }
+    });
+
+    // 2. PROGRESS STEPS: Unique Animation -> Spring Progress Bar + Staggered Cards
+    inView(".progress-steps", (info) => {
+      if (info.target) {
+        animate("#progFill", { width: ["0%", "100%"] }, { duration: 1.5, ease: "easeInOut" });
+        animate(".step-box", 
+          { opacity: [0, 1], y: [30, 0] }, 
+          { duration: 0.6, delay: stagger(0.2, { startDelay: 0.5 }), ease: "backOut" }
+        );
+      }
+    });
+
+    // 3. FAQ GRID: Unique Animation -> Cascade Scale (Left to Right)
+    inView(".faq-grid", (info) => {
+      if (info.target) {
+        animate(".faq-left", { opacity: [0, 1], x: [-20, 0] }, { duration: 0.8 });
+        animate(".faq-box", 
+          { opacity: [0, 1], scale: [0.95, 1] }, 
+          { duration: 0.5, delay: stagger(0.15), ease: "easeOut" }
+        );
+      }
+    });
+
+    // 4. FEATURE TAGS: Unique Animation -> Random Pop-in
+    inView(".tags-section", (info) => {
+      if (info.target) {
+        animate(".feature-tag", 
+          { opacity: [0, 1], scale: [0.5, 1], rotate: [Math.random() * 10 - 5, 0] }, 
+          { duration: 0.6, delay: stagger(0.08), ease: "backOut" }
+        );
+      }
+    });
+
+    // 5. QUOTE: Unique Animation -> Fade Up with Staggered Text
+    inView(".quote-section", (info) => {
+      if (info.target) {
+        animate(".quote-icon", { opacity: [0, 0.95], scale: [0.5, 1] }, { duration: 0.8 });
+        animate(".quote-text", { opacity: [0, 1], y: [20, 0] }, { duration: 0.8, delay: 0.2 });
+        animate(".quote-author", { opacity: [0, 1], y: [20, 0] }, { duration: 0.8, delay: 0.4 });
+      }
+    });
+
+    // 6. PARALLAX: Unique Animation -> Scroll-linked text reveal
+    scroll(animate(".sp-content", { opacity: [0.5, 1], scale: [0.95, 1] }, { ease: "linear" }));
+
+    // 7. MINIMAL CTA: Unique Animation -> Elastic Pop
+    inView(".minimal-cta", (info) => {
+      if (info.target) {
+        animate(".minimal-cta h2", { opacity: [0, 1], y: [30, 0] }, { duration: 0.8 });
+        animate(".minimal-cta p", { opacity: [0, 1], y: [30, 0] }, { duration: 0.8, delay: 0.1 });
+        animate(".min-btn", { opacity: [0, 1], scale: [0.8, 1] }, { duration: 0.6, delay: 0.3, ease: "backOut" });
+      }
+    });
+  </script>
+
+  <!-- NAVBAR/FOOTER LOGIC (Identical) -->
+  <script>
+    (function() {
+      const htmlElement = document.documentElement;
+      const desktopThemeToggle = document.getElementById('themeToggle');
+      const desktopRtlToggle = document.getElementById('rtlToggle');
+      const mobileThemeToggle = document.getElementById('mobileThemeToggle');
+      const mobileRtlToggle = document.getElementById('mobileRtlToggle');
+      const themeIcons = [document.getElementById('themeIcon'), document.getElementById('mobileThemeIcon')];
+      const hamburgerBtn = document.getElementById('hamburgerBtn');
+      const hamburgerIcon = document.getElementById('hamburgerIcon');
+      const mobileMenu = document.getElementById('mobileMenu');
+
+      function updateTheme(isDark) {
+        if (isDark) {
+          htmlElement.setAttribute('data-theme', 'dark');
+          themeIcons.forEach(icon => { icon.classList.remove('fa-moon'); icon.classList.add('fa-sun'); });
+          localStorage.setItem('theme', 'dark');
+        } else {
+          htmlElement.removeAttribute('data-theme');
+          themeIcons.forEach(icon => { icon.classList.remove('fa-sun'); icon.classList.add('fa-moon'); });
+          localStorage.setItem('theme', 'light');
+        }
+      }
+      if (localStorage.getItem('theme') === 'dark') updateTheme(true);
+      desktopThemeToggle.addEventListener('click', () => updateTheme(htmlElement.getAttribute('data-theme') !== 'dark'));
+      mobileThemeToggle.addEventListener('click', () => updateTheme(htmlElement.getAttribute('data-theme') !== 'dark'));
+
+      function updateDirection(isRtl) {
+        if (isRtl) { htmlElement.setAttribute('dir', 'rtl'); localStorage.setItem('dir', 'rtl'); }
+        else { htmlElement.setAttribute('dir', 'ltr'); localStorage.setItem('dir', 'ltr'); }
+      }
+      if (localStorage.getItem('dir') === 'rtl') updateDirection(true);
+      desktopRtlToggle.addEventListener('click', () => updateDirection(htmlElement.getAttribute('dir') !== 'rtl'));
+      mobileRtlToggle.addEventListener('click', () => updateDirection(htmlElement.getAttribute('dir') !== 'rtl'));
+
+      const mobileBackdrop = document.createElement('div');
+      mobileBackdrop.className = 'mobile-backdrop';
+      document.body.appendChild(mobileBackdrop);
+      document.body.appendChild(mobileMenu);
+      if (!mobileMenu.querySelector('.mobile-drawer-header')) {
+        const drawerHeader = document.createElement('div');
+        drawerHeader.className = 'mobile-drawer-header';
+        drawerHeader.innerHTML = '<a href="index.html" class="navbar__brand">Scan<span>Dine</span></a><button type="button" class="mobile-drawer-close" aria-label="Close menu"><i class="fas fa-times"></i></button>';
+        mobileMenu.prepend(drawerHeader);
+      }
+      const drawerCloseBtn = mobileMenu.querySelector('.mobile-drawer-close');
+
+      function setMobileMenu(open) {
+        if (open) {
+          mobileMenu.classList.add('active'); mobileBackdrop.classList.add('active'); hamburgerIcon.classList.replace('fa-bars', 'fa-times'); document.body.style.overflow = 'hidden';
+        } else {
+          mobileMenu.classList.remove('active'); mobileBackdrop.classList.remove('active'); hamburgerIcon.classList.replace('fa-times', 'fa-bars'); document.body.style.overflow = '';
+        }
+      }
+
+      hamburgerBtn.addEventListener('click', () => setMobileMenu(!mobileMenu.classList.contains('active')));
+      if (drawerCloseBtn) drawerCloseBtn.addEventListener('click', () => setMobileMenu(false));
+      mobileBackdrop.addEventListener('click', () => setMobileMenu(false));
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && mobileMenu.classList.contains('active')) setMobileMenu(false); });
+
+      const mobileSubLinks = document.querySelectorAll('.mobile-menu__link[data-submenu]');
+      mobileSubLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
+          e.preventDefault();
+          const targetId = link.getAttribute('data-submenu');
+          const submenu = document.getElementById(targetId);
+          document.querySelectorAll('.mobile-submenu').forEach(sm => { if (sm.id !== targetId) sm.classList.remove('open'); });
+          submenu.classList.toggle('open');
+          const chevron = link.querySelector('i');
+          if (chevron) chevron.style.transform = submenu.classList.contains('open') ? 'rotate(180deg)' : 'rotate(0deg)';
+        });
+      });
+
+      window.addEventListener('resize', () => {
+        if (window.innerWidth > 992 && mobileMenu.classList.contains('active')) {
+          setMobileMenu(false);
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

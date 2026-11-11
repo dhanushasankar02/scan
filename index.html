@@ -1,0 +1,1516 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ScanDine | Next-Gen Dining</title>
+  <link rel="icon" type="image/svg+xml" href="images/favicon.svg">
+  <link rel="icon" type="image/png" href="images/favicon.png">
+  <link rel="shortcut icon" href="favicon.ico">
+  <link rel="apple-touch-icon" href="images/favicon.png">
+  <!-- Font Awesome 6 (free) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  
+  <style>
+    /* ----- GLOBAL RESET & VARIABLES ----- */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --navbar-bg: #ffffff;
+      --footer-bg: #f8fafc;
+      --navbar-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+      --text-primary: #1e1e2f;
+      --text-secondary: #4a4a6a;
+      --accent: #f97316;
+      --accent-hover: #ea580c;
+      --dropdown-bg: #ffffff;
+      --dropdown-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+      --border-light: #e9e9f0;
+      --icon-color: #4a4a6a;
+      --transition: all 0.2s ease;
+      
+      /* Custom Page Variables */
+      --surface-color: #ffffff;
+      --surface-alt: #f1f5f9;
+      --text-inverse: #ffffff;
+    }
+
+    /* DARK MODE VARIABLES */
+    html[data-theme="dark"] {
+      --navbar-bg: #12121c;
+      --footer-bg: #0f0f16;
+      --navbar-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+      --text-primary: #f0f0f5;
+      --text-secondary: #b0b0c0;
+      --accent: #fb923c;
+      --accent-hover: #f97316;
+      --dropdown-bg: #1e1e2c;
+      --dropdown-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.6);
+      --border-light: #2a2a3a;
+      --icon-color: #c0c0d0;
+      
+      --surface-color: #1e1e2c;
+      --surface-alt: #12121c;
+      --text-inverse: #ffffff;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+      background-color: #f8fafc;
+      color: var(--text-primary);
+      transition: background-color 0.3s, color 0.3s;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    html[data-theme="dark"] body { background-color: #0b0b12; }
+
+    main { flex: 1; }
+
+    /* =========================================
+       NAVBAR (UNTOUCHED)
+       ========================================= */
+    .navbar {
+      background: var(--navbar-bg);
+      box-shadow: var(--navbar-shadow);
+      padding: 0.75rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      transition: background 0.2s, box-shadow 0.2s;
+      flex-wrap: wrap;
+    }
+
+    .navbar__brand {
+      font-size: 1.6rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: var(--text-primary);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+    }
+
+    .navbar__brand span { color: var(--accent); }
+
+    .navbar__menu {
+      display: flex;
+      align-items: center;
+      list-style: none;
+      gap: 1.75rem;
+      margin: 0;
+      padding: 0;
+    }
+
+    .navbar__item {
+      position: relative;
+      display: flex;
+      align-items: center;
+      height: 100%;
+    }
+
+    .navbar__link {
+      text-decoration: none;
+      color: var(--text-primary);
+      font-weight: 500;
+      font-size: 0.95rem;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      padding: 0.5rem 0;
+      transition: var(--transition);
+      border-bottom: 2px solid transparent;
+    }
+
+    .navbar__link:hover,
+    .navbar__link.is-active {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+    }
+
+    .navbar__link i {
+      font-size: 0.7rem;
+      color: var(--text-secondary);
+      transition: transform 0.2s;
+    }
+
+    .navbar__link.is-active i { color: var(--accent); }
+
+    .navbar__item:hover .navbar__link i { transform: rotate(180deg); }
+
+    .navbar__link--login {
+      background-color: var(--accent);
+      color: #ffffff !important;
+      padding: 0.5rem 1.25rem !important;
+      border-radius: 0.5rem;
+      border-bottom: none !important;
+      font-weight: 600;
+      transition: var(--transition);
+    }
+
+    .navbar__link--login:hover {
+      background-color: var(--accent-hover);
+      color: #ffffff !important;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);
+    }
+
+    .dropdown {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      min-width: 200px;
+      background: var(--dropdown-bg);
+      border-radius: 0.75rem;
+      box-shadow: var(--dropdown-shadow);
+      padding: 0.5rem 0;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(8px);
+      transition: all 0.2s ease;
+      border: 1px solid var(--border-light);
+      z-index: 100;
+      list-style: none;
+    }
+
+    .navbar__item:hover .dropdown {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+
+    .dropdown li a {
+      display: block;
+      padding: 0.5rem 1.25rem;
+      text-decoration: none;
+      color: var(--text-primary);
+      font-size: 0.9rem;
+      transition: background 0.15s;
+    }
+
+    .dropdown li a:hover,
+    .dropdown li a.is-active { background: var(--border-light); color: var(--accent); font-weight: 600; }
+
+    .navbar__icons {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .icon-btn {
+      background: transparent;
+      border: none;
+      font-size: 1.15rem;
+      color: var(--icon-color);
+      cursor: pointer;
+      padding: 0.4rem;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: var(--transition);
+      width: 2.2rem;
+      height: 2.2rem;
+    }
+
+    .icon-btn:hover { background: var(--border-light); color: var(--accent); }
+
+    .hamburger {
+      display: none;
+      background: transparent;
+      border: none;
+      font-size: 1.5rem;
+      color: var(--text-primary);
+      cursor: pointer;
+      padding: 0.4rem;
+      border-radius: 0.5rem;
+      transition: var(--transition);
+    }
+
+    .hamburger:hover { background: var(--border-light); }
+
+    .mobile-menu {
+      display: none;
+      width: 100%;
+      background: var(--navbar-bg);
+      padding: 1rem 0;
+      border-top: 1px solid var(--border-light);
+      transition: all 0.25s ease;
+    }
+
+    .mobile-menu.active { display: block; }
+
+    .mobile-menu__list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+      padding: 0 1rem;
+    }
+
+    .mobile-menu__link {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.75rem 1rem;
+      text-decoration: none;
+      color: var(--text-primary);
+      font-weight: 500;
+      border-radius: 0.5rem;
+      transition: background 0.15s;
+    }
+
+    .mobile-menu__link:hover,
+    .mobile-menu__link.is-active { background: var(--border-light); color: var(--accent); }
+    .mobile-menu__link i { font-size: 0.75rem; transition: transform 0.2s; }
+
+    .mobile-menu__link--login {
+      background-color: var(--accent);
+      color: #ffffff !important;
+      justify-content: center;
+      margin: 0.5rem 1rem;
+      padding: 0.8rem;
+      font-weight: 600;
+    }
+
+    .mobile-menu__link--login:hover {
+      background-color: var(--accent-hover);
+      color: #ffffff !important;
+    }
+
+    .mobile-submenu {
+      list-style: none;
+      padding-left: 1.5rem;
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.25s ease;
+    }
+
+    .mobile-submenu.open { max-height: 300px; }
+
+    .mobile-submenu li a {
+      display: block;
+      padding: 0.5rem 1rem;
+      text-decoration: none;
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      border-radius: 0.4rem;
+    }
+
+    .mobile-submenu li a:hover,
+    .mobile-submenu li a.is-active { background: var(--border-light); color: var(--accent); font-weight: 600; }
+
+    .mobile-preferences {
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 1.5rem;
+      padding: 1rem 2rem;
+      margin-top: 0.5rem;
+      border-top: 1px solid var(--border-light);
+    }
+
+    .mobile-pref-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    .mobile-pref-item .icon-btn { width: 2rem; height: 2rem; font-size: 1.1rem; }
+
+    html[dir="rtl"] .dropdown { left: auto; right: 0; }
+    html[dir="rtl"] .mobile-submenu { padding-left: 0; padding-right: 1.5rem; }
+    html[dir="rtl"] .mobile-preferences { flex-direction: row-reverse; justify-content: flex-end; }
+
+    @media screen and (max-width: 992px) {
+      .navbar { padding: 0.75rem 1.25rem; }
+      .navbar__menu { display: none; }
+      .navbar__icons .desktop-only { display: none; }
+      .hamburger { display: flex; }
+      .mobile-menu {
+        display: flex;
+        flex-direction: column;
+        position: fixed;
+        top: 0;
+        right: 0;
+        left: auto;
+        width: min(320px, 85vw);
+        height: 100vh;
+        height: 100dvh;
+        padding: 1.25rem 0 2rem;
+        border-top: none;
+        border-left: 1px solid var(--border-light);
+        box-shadow: -12px 0 36px rgba(0, 0, 0, 0.25);
+        z-index: 1200;
+        overflow-y: auto;
+        transform: translateX(100%);
+        visibility: hidden;
+        transition: transform 0.28s ease, visibility 0.28s ease;
+      }
+      .mobile-menu.active {
+        display: flex;
+        transform: translateX(0);
+        visibility: visible;
+      }
+      .mobile-drawer-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 1.25rem 1rem;
+        margin-bottom: 0.75rem;
+        border-bottom: 1px solid var(--border-light);
+      }
+      .mobile-drawer-close {
+        background: transparent;
+        border: none;
+        font-size: 1.35rem;
+        color: var(--text-primary);
+        cursor: pointer;
+        padding: 0.35rem 0.55rem;
+        border-radius: 0.5rem;
+        transition: var(--transition);
+      }
+      .mobile-drawer-close:hover { background: var(--border-light); color: var(--accent); }
+      .mobile-backdrop {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(10, 10, 18, 0.55);
+        backdrop-filter: blur(2px);
+        z-index: 1150;
+      }
+      .mobile-backdrop.active { display: block; }
+    }
+
+    /* =========================================
+       UNIQUE PAGE SECTIONS
+       ========================================= */
+    
+    .section-wrapper {
+      padding: 6rem 2rem;
+      max-width: 1200px;
+      margin: 0 auto;
+      position: relative;
+    }
+
+    .section-title {
+      font-size: 2.5rem;
+      font-weight: 800;
+      margin-bottom: 1rem;
+      letter-spacing: -0.03em;
+    }
+
+    .section-subtitle {
+      color: var(--text-secondary);
+      font-size: 1.1rem;
+      line-height: 1.6;
+      max-width: 600px;
+      margin-bottom: 3rem;
+    }
+
+    /* 1. HERO SECTION (Unique Split Design) */
+    .hero {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      align-items: center;
+      padding-top: 4rem;
+    }
+
+    .hero__content h1 {
+      font-size: 3.5rem;
+      line-height: 1.1;
+      font-weight: 800;
+      margin-bottom: 1.5rem;
+      letter-spacing: -0.03em;
+    }
+
+    .hero__content h1 span {
+      color: var(--accent);
+      position: relative;
+      display: inline-block;
+    }
+
+    .hero__content p {
+      font-size: 1.2rem;
+      color: var(--text-secondary);
+      margin-bottom: 2rem;
+      line-height: 1.6;
+    }
+
+    .hero__btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: var(--accent);
+      color: #fff;
+      padding: 1rem 2rem;
+      border-radius: 0.75rem;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 1.1rem;
+      transition: var(--transition);
+    }
+
+    .hero__btn:hover {
+      background: var(--accent-hover);
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(249, 115, 22, 0.2);
+    }
+
+    .hero__image-wrapper {
+      position: relative;
+    }
+
+    .hero__image-wrapper img {
+      width: 100%;
+      border-radius: 2rem;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+      border: 1px solid var(--border-light);
+    }
+
+    /* 2. LIVE STATS BANNER (Unique Horizontal Design) */
+    .stats-banner {
+      background: var(--surface-color);
+      border-y: 1px solid var(--border-light);
+      padding: 3rem 2rem;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 2rem;
+    }
+
+    .stat-item {
+      text-align: center;
+    }
+
+    .stat-item h3 {
+      font-size: 2.5rem;
+      color: var(--accent);
+      font-weight: 800;
+      margin-bottom: 0.5rem;
+    }
+
+    .stat-item p {
+      color: var(--text-secondary);
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-size: 0.9rem;
+    }
+
+    /* 3. HOW IT WORKS (Unique Vertical Steps with connecting line) */
+    .how-it-works {
+      display: flex;
+      flex-direction: column;
+      gap: 3rem;
+      position: relative;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .how-it-works::before {
+      content: '';
+      position: absolute;
+      left: 50%;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: var(--border-light);
+      transform: translateX(-50%);
+      z-index: 0;
+    }
+
+    .step {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      position: relative;
+      z-index: 1;
+    }
+
+    .step:nth-child(even) { flex-direction: row-reverse; }
+
+    .step__content {
+      width: 45%;
+      background: var(--surface-color);
+      padding: 2rem;
+      border-radius: 1.5rem;
+      border: 1px solid var(--border-light);
+      box-shadow: var(--navbar-shadow);
+    }
+
+    .step__content h3 { font-size: 1.5rem; margin-bottom: 0.5rem; color: var(--accent); }
+    .step__content p { color: var(--text-secondary); line-height: 1.5; }
+
+    .step__number {
+      width: 4rem;
+      height: 4rem;
+      background: var(--accent);
+      color: #fff;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      font-weight: 800;
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      border: 4px solid var(--navbar-bg);
+    }
+
+    /* 4. BENTO GRID FEATURES (Unique Grid Design) */
+    .bento-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+    }
+
+    .bento-card {
+      background: var(--surface-color);
+      border: 1px solid var(--border-light);
+      border-radius: 1.5rem;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+      transition: var(--transition);
+    }
+
+    .bento-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 18px 36px rgba(0, 0, 0, 0.08);
+    }
+
+    .bento-card__media {
+      position: relative;
+      width: 100%;
+      height: 195px;
+      overflow: hidden;
+      flex-shrink: 0;
+      background: var(--surface-alt);
+    }
+
+    .bento-card__img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.4s ease;
+    }
+
+    .bento-card:hover .bento-card__img {
+      transform: scale(1.04);
+    }
+
+    .bento-card i {
+      position: absolute;
+      top: 1rem;
+      left: 1rem;
+      font-size: 1.35rem;
+      color: var(--accent);
+      background: rgba(255, 255, 255, 0.94);
+      padding: 0.6rem;
+      border-radius: 0.85rem;
+      z-index: 2;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+    }
+
+    html[data-theme="dark"] .bento-card i {
+      background: rgba(18, 18, 28, 0.88);
+    }
+
+    html[dir="rtl"] .bento-card i {
+      left: auto;
+      right: 1rem;
+    }
+
+    .bento-card__body {
+      padding: 1.35rem 1.5rem 1.5rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      flex: 1;
+    }
+
+    .bento-card h3 { font-size: 1.3rem; margin-bottom: 0.4rem; }
+    .bento-card p { color: var(--text-secondary); font-size: 0.94rem; line-height: 1.55; }
+
+    .bento-card--large { grid-column: span 2; grid-row: span 2; }
+    .bento-card--large .bento-card__media { flex: 1; height: auto; min-height: 360px; }
+    .bento-card--large .bento-card__body { flex: 0 0 auto; padding: 1.65rem 2rem; }
+    .bento-card--large h3 { font-size: 1.55rem; }
+    .bento-card--large i { font-size: 1.75rem; padding: 0.75rem; }
+
+    .bento-card--wide {
+      grid-column: 1 / -1;
+      flex-direction: row;
+      align-items: stretch;
+    }
+
+    .bento-card--wide .bento-card__media {
+      width: 52%;
+      height: auto;
+      min-height: 260px;
+    }
+
+    .bento-card--wide .bento-card__body {
+      padding: 2rem 2.5rem;
+    }
+
+    .bento-card--wide h3 { font-size: 1.5rem; }
+
+    /* 5. SPLIT SCREEN SHOWCASE (Unique Side-by-side Text/Image) */
+    .showcase {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      border-radius: 2rem;
+      overflow: hidden;
+      background: var(--surface-color);
+      border: 1px solid var(--border-light);
+      box-shadow: var(--navbar-shadow);
+    }
+
+    .showcase__img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      min-height: 400px;
+    }
+
+    .showcase__content {
+      padding: 4rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .showcase__content h2 { font-size: 2.2rem; margin-bottom: 1rem; }
+    .showcase__content p { color: var(--text-secondary); line-height: 1.7; margin-bottom: 2rem; font-size: 1.1rem; }
+    
+    .check-list { list-style: none; display: flex; flex-direction: column; gap: 1rem; }
+    .check-list li { display: flex; align-items: center; gap: 0.75rem; font-weight: 500; }
+    .check-list i { color: var(--accent); background: rgba(249, 115, 22, 0.1); padding: 0.4rem; border-radius: 50%; font-size: 0.8rem; }
+
+    /* 6. TESTIMONIALS (Editorial Grid Cards) */
+    .testimonial-container {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 2rem;
+      margin-top: 2.5rem;
+    }
+
+    .testimonial-card {
+      background: var(--surface-color);
+      padding: 2.25rem;
+      border-radius: 1.5rem;
+      border: 1px solid var(--border-light);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 1.75rem;
+      position: relative;
+      box-shadow: 0 12px 32px rgba(15, 23, 42, 0.05);
+      transition: var(--transition);
+    }
+
+    .testimonial-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(249, 115, 22, 0.35);
+      box-shadow: 0 20px 40px rgba(15, 23, 42, 0.08);
+    }
+
+    .testimonial-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .testimonial-stars {
+      display: inline-flex;
+      gap: 0.25rem;
+      color: #f59e0b;
+      font-size: 0.92rem;
+    }
+
+    .testimonial-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.32rem 0.75rem;
+      border-radius: 999px;
+      background: rgba(249, 115, 22, 0.1);
+      color: var(--accent);
+      font-size: 0.78rem;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .testimonial-text {
+      font-size: 1.1rem;
+      line-height: 1.7;
+      color: var(--text-primary);
+      font-weight: 500;
+    }
+
+    .testimonial-author {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding-top: 1.25rem;
+      border-top: 1px solid var(--border-light);
+    }
+
+    .testimonial-author img {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid rgba(249, 115, 22, 0.3);
+      flex-shrink: 0;
+    }
+
+    .testimonial-author h4 { font-size: 1.02rem; margin-bottom: 0.15rem; }
+    .testimonial-author span { font-size: 0.86rem; color: var(--text-secondary); }
+
+    /* 7. CTA SECTION (Unique Floating Box) */
+    .cta-section {
+      padding: 0 2rem 6rem;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .cta-box {
+      background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+      border-radius: 2rem;
+      padding: 5rem 2rem;
+      text-align: center;
+      color: #fff;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 20px 40px rgba(249, 115, 22, 0.3);
+    }
+
+    .cta-box h2 { font-size: 3rem; margin-bottom: 1rem; font-weight: 800; }
+    .cta-box p { font-size: 1.2rem; margin-bottom: 2.5rem; opacity: 0.9; }
+    
+    .cta-btn {
+      background: #fff;
+      color: var(--accent);
+      padding: 1rem 2.5rem;
+      border-radius: 0.75rem;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 1.1rem;
+      display: inline-block;
+      transition: var(--transition);
+    }
+
+    .cta-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+    }
+
+    /* RESPONSIVE DESIGN FOR SECTIONS */
+    @media (max-width: 992px) {
+      .hero { grid-template-columns: 1fr; text-align: center; gap: 2rem; }
+      .hero__content h1 { font-size: 2.8rem; }
+      .section-title { font-size: 2rem; }
+      .bento-grid { grid-template-columns: 1fr; }
+      .bento-card--large, .bento-card--wide { grid-column: span 1; grid-row: span 1; flex-direction: column; }
+      .bento-card__media,
+      .bento-card--large .bento-card__media,
+      .bento-card--wide .bento-card__media { width: 100%; height: 220px; min-height: 220px; flex: none; }
+      .bento-card__body,
+      .bento-card--large .bento-card__body,
+      .bento-card--wide .bento-card__body { padding: 1.35rem 1.5rem 1.5rem; }
+      .showcase { grid-template-columns: 1fr; }
+      .showcase__img { min-height: 300px; }
+      .showcase__content { padding: 2rem; }
+      .how-it-works::before { left: 2rem; }
+      .step { flex-direction: column !important; align-items: flex-start; padding-left: 4rem; }
+      .step__content { width: 100%; }
+      .step__number { left: 0; transform: none; width: 3rem; height: 3rem; font-size: 1.2rem; }
+      .cta-box h2 { font-size: 2rem; }
+      .testimonial-container { grid-template-columns: 1fr; gap: 1.25rem; }
+      .testimonial-card { padding: 1.65rem; }
+    }
+
+    /* =========================================
+       FOOTER (UNTOUCHED)
+       ========================================= */
+    .footer {
+      background-color: var(--footer-bg);
+      border-top: 1px solid var(--border-light);
+      padding: 4rem 2rem 2rem;
+      color: var(--text-secondary);
+      transition: background-color 0.2s, border-color 0.2s;
+    }
+
+    .footer__container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1.5fr;
+      gap: 3rem;
+    }
+
+    .footer__col h3 {
+      color: var(--text-primary);
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 1.5rem;
+    }
+
+    .footer__brand {
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: var(--text-primary);
+      text-decoration: none;
+      display: inline-block;
+      margin-bottom: 1rem;
+    }
+
+    .footer__brand span { color: var(--accent); }
+
+    .footer__desc {
+      font-size: 0.95rem;
+      line-height: 1.6;
+      margin-bottom: 1.5rem;
+      max-width: 300px;
+    }
+
+    .footer__socials { display: flex; gap: 0.75rem; }
+
+    .footer__socials a {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 2.2rem;
+      height: 2.2rem;
+      border-radius: 50%;
+      background: var(--navbar-bg);
+      color: var(--text-primary);
+      text-decoration: none;
+      border: 1px solid var(--border-light);
+      transition: var(--transition);
+    }
+
+    .footer__socials a:hover {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+      transform: translateY(-2px);
+    }
+
+    .footer__links { list-style: none; display: flex; flex-direction: column; gap: 0.8rem; }
+
+    .footer__links a {
+      text-decoration: none;
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+      transition: var(--transition);
+    }
+
+    .footer__links a:hover { color: var(--accent); padding-left: 4px; }
+    html[dir="rtl"] .footer__links a:hover { padding-left: 0; padding-right: 4px; }
+
+    .footer__newsletter p { font-size: 0.95rem; line-height: 1.6; margin-bottom: 1rem; }
+
+    .footer__form { display: flex; gap: 0.5rem; }
+
+    .footer__form input {
+      flex: 1;
+      padding: 0.6rem 1rem;
+      border-radius: 0.5rem;
+      border: 1px solid var(--border-light);
+      background: var(--navbar-bg);
+      color: var(--text-primary);
+      font-size: 0.9rem;
+      outline: none;
+      transition: var(--transition);
+    }
+
+    .footer__form input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.2);
+    }
+
+    .footer__form button {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      padding: 0.6rem 1rem;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.9rem;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .footer__form button:hover { background: var(--accent-hover); }
+
+    .footer__bottom {
+      max-width: 1200px;
+      margin: 3rem auto 0;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border-light);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.9rem;
+    }
+
+    .footer__legal { display: flex; gap: 1.5rem; }
+    .footer__legal a { text-decoration: none; color: var(--text-secondary); transition: var(--transition); }
+    .footer__legal a:hover { color: var(--accent); }
+
+    @media screen and (max-width: 992px) {
+      .footer__container { grid-template-columns: 1fr 1fr; gap: 2.5rem; }
+      .footer__bottom { flex-direction: column; gap: 1rem; text-align: center; }
+    }
+
+    @media screen and (max-width: 600px) {
+      .footer__container { grid-template-columns: 1fr; }
+      .footer__form { flex-direction: column; }
+      .footer__legal { flex-wrap: wrap; justify-content: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ========== NAVBAR ========== -->
+  <nav class="navbar">
+    <a href="index.html" class="navbar__brand">Scan<span>Dine</span></a>
+    <ul class="navbar__menu">
+      <li class="navbar__item">
+        <a href="#" class="navbar__link is-active">Home <i class="fas fa-chevron-down"></i></a>
+        <ul class="dropdown">
+          <li><a href="index.html" class="is-active" aria-current="page">Home1</a></li>
+          <li><a href="home2.html">Home2</a></li>
+        </ul>
+      </li>
+      <li class="navbar__item"><a href="features.html" class="navbar__link">Features</a></li>
+      <li class="navbar__item"><a href="pricing plans.html" class="navbar__link">Pricing Plans</a></li>
+      <li class="navbar__item"><a href="demo request.html" class="navbar__link">Demo Request</a></li>
+      <li class="navbar__item"><a href="contact.html" class="navbar__link">Contact</a></li>
+      <li class="navbar__item">
+        <a href="#" class="navbar__link">Dashboard <i class="fas fa-chevron-down"></i></a>
+        <ul class="dropdown">
+          <li><a href="user-dashboard.html">User Dashboard</a></li>
+          <li><a href="admin-dashboard.html">Admin Dashboard</a></li>
+        </ul>
+      </li>
+      <li class="navbar__item">
+        <a href="login.html" class="navbar__link navbar__link--login">Login</a>
+      </li>
+    </ul>
+    <div class="navbar__icons">
+      <button class="icon-btn desktop-only" id="themeToggle" aria-label="Toggle dark mode">
+        <i class="fas fa-moon" id="themeIcon"></i>
+      </button>
+      <button class="icon-btn desktop-only" id="rtlToggle" aria-label="Toggle RTL/LTR">
+        <i class="fas fa-arrow-right-arrow-left"></i>
+      </button>
+      <button class="hamburger" id="hamburgerBtn" aria-label="Open menu">
+        <i class="fas fa-bars" id="hamburgerIcon"></i>
+      </button>
+    </div>
+    <div class="mobile-menu" id="mobileMenu">
+      <ul class="mobile-menu__list">
+        <li class="mobile-menu__item">
+          <a href="#" class="mobile-menu__link is-active" data-submenu="homeSub">
+            Home <i class="fas fa-chevron-down"></i>
+          </a>
+          <ul class="mobile-submenu" id="homeSub">
+            <li><a href="index.html" class="is-active" aria-current="page">Home1</a></li>
+            <li><a href="home2.html">Home2</a></li>
+          </ul>
+        </li>
+        <li class="mobile-menu__item"><a href="features.html" class="mobile-menu__link">Features</a></li>
+        <li class="mobile-menu__item"><a href="pricing plans.html" class="mobile-menu__link">Pricing Plans</a></li>
+        <li class="mobile-menu__item"><a href="demo request.html" class="mobile-menu__link">Demo Request</a></li>
+        <li class="mobile-menu__item"><a href="contact.html" class="mobile-menu__link">Contact</a></li>
+        <li class="mobile-menu__item">
+          <a href="#" class="mobile-menu__link" data-submenu="dashSub">
+            Dashboard <i class="fas fa-chevron-down"></i>
+          </a>
+          <ul class="mobile-submenu" id="dashSub">
+            <li><a href="user-dashboard.html">User Dashboard</a></li>
+            <li><a href="admin-dashboard.html">Admin Dashboard</a></li>
+          </ul>
+        </li>
+        <li class="mobile-menu__item">
+          <a href="login.html" class="mobile-menu__link mobile-menu__link--login">Login</a>
+        </li>
+      </ul>
+      <div class="mobile-preferences">
+        <div class="mobile-pref-item" id="mobileThemeToggle">
+          <button class="icon-btn" aria-label="Toggle dark mode">
+            <i class="fas fa-moon" id="mobileThemeIcon"></i>
+          </button>
+          <span>Dark Mode</span>
+        </div>
+        <div class="mobile-pref-item" id="mobileRtlToggle">
+          <button class="icon-btn" aria-label="Toggle RTL/LTR">
+            <i class="fas fa-arrow-right-arrow-left"></i>
+          </button>
+          <span>RTL / LTR</span>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ========== MAIN CONTENT ========== -->
+  <main>
+    
+    <!-- SECTION 1: HERO (Framer: Staggered Fade In) -->
+    <section class="section-wrapper hero" id="hero">
+      <div class="hero__content">
+        <h1>Dine Smarter with <span>ScanDine</span></h1>
+        <p>Transform your restaurant experience with our seamless QR code menus and contactless ordering. Fast for customers, powerful for you.</p>
+        <a href="#" class="hero__btn">Get Started <i class="fas fa-arrow-right"></i></a>
+      </div>
+      <div class="hero__image-wrapper">
+        <img src="images/index-hero-tablet.jpg" alt="ScanDine table ordering tablet and QR code menu stand">
+      </div>
+    </section>
+
+    <!-- SECTION 2: STATS BANNER (Framer: Slide Up & Scale) -->
+    <section class="stats-banner">
+      <div class="stat-item">
+        <h3>500+</h3>
+        <p>Restaurants</p>
+      </div>
+      <div class="stat-item">
+        <h3>1M+</h3>
+        <p>Orders Processed</p>
+      </div>
+      <div class="stat-item">
+        <h3>99.9%</h3>
+        <p>Uptime</p>
+      </div>
+      <div class="stat-item">
+        <h3>0s</h3>
+        <p>App Download Needed</p>
+      </div>
+    </section>
+
+    <!-- SECTION 3: HOW IT WORKS (Framer: Slide In From Left/Right) -->
+    <section class="section-wrapper" id="how-it-works">
+      <div style="text-align: center;">
+        <h2 class="section-title">How It Works</h2>
+        <p class="section-subtitle" style="margin: 0 auto 3rem;">Three simple steps to upgrade your dining experience.</p>
+      </div>
+      
+      <div class="how-it-works">
+        <!-- Step 1 -->
+        <div class="step">
+          <div class="step__content">
+            <h3>Scan</h3>
+            <p>Customers simply scan the QR code placed on their table using their smartphone camera.</p>
+          </div>
+          <div class="step__number">1</div>
+        </div>
+        <!-- Step 2 -->
+        <div class="step">
+          <div class="step__content">
+            <h3>Browse</h3>
+            <p>Your beautifully designed digital menu opens instantly in their browser. No app required.</p>
+          </div>
+          <div class="step__number">2</div>
+        </div>
+        <!-- Step 3 -->
+        <div class="step">
+          <div class="step__content">
+            <h3>Order & Pay</h3>
+            <p>They place the order directly from their phone and pay securely, sending it straight to your kitchen.</p>
+          </div>
+          <div class="step__number">3</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 4: BENTO GRID FEATURES (Framer: Pop In / Spring) -->
+    <section class="section-wrapper" id="features">
+      <h2 class="section-title">Everything You Need</h2>
+      <p class="section-subtitle">Powerful features designed to streamline your operations and delight your guests.</p>
+      
+      <div class="bento-grid">
+        <div class="bento-card bento-card--large">
+          <div class="bento-card__media">
+            <img src="images/index-bento-analytics.jpg" alt="Restaurant manager tablet showing real-time revenue and dining analytics" class="bento-card__img">
+            <i class="fas fa-chart-line"></i>
+          </div>
+          <div class="bento-card__body">
+            <h3>Real-Time Analytics</h3>
+            <p>Track your best-selling items, peak hours, and revenue directly from your dashboard.</p>
+          </div>
+        </div>
+        <div class="bento-card">
+          <div class="bento-card__media">
+            <img src="images/index-bento-qr.jpg" alt="Tabletop QR code stand reading Scan to order" class="bento-card__img" style="object-position: center 26%;">
+            <i class="fas fa-qrcode"></i>
+          </div>
+          <div class="bento-card__body">
+            <h3>QR Management</h3>
+            <p>Generate and update QR codes instantly.</p>
+          </div>
+        </div>
+        <div class="bento-card">
+          <div class="bento-card__media">
+            <img src="images/index-bento-menu.jpg" alt="Plated fine dining appetizer ready for live digital menu display" class="bento-card__img">
+            <i class="fas fa-utensils"></i>
+          </div>
+          <div class="bento-card__body">
+            <h3>Menu Updates</h3>
+            <p>Change prices or mark items as sold out in real-time.</p>
+          </div>
+        </div>
+        <div class="bento-card bento-card--wide">
+          <div class="bento-card__media">
+            <img src="images/index-bento-payments.jpg" alt="Contactless mobile payment at a restaurant counter terminal" class="bento-card__img">
+            <i class="fas fa-shield-alt"></i>
+          </div>
+          <div class="bento-card__body">
+            <h3>Secure Payments</h3>
+            <p>Integrated with top payment gateways for a safe, contactless checkout experience.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 5: SPLIT SCREEN SHOWCASE (Framer: Staggered Image Reveal) -->
+    <section class="section-wrapper" id="showcase">
+      <div class="showcase">
+        <img src="images/index-kitchen-kds.jpg" alt="Chef working at kitchen pass with digital Kitchen Display System" class="showcase__img">
+        <div class="showcase__content">
+          <h2>Built for the Kitchen</h2>
+          <p>Orders flow directly to your Kitchen Display System (KDS) or printer. No more lost tickets or miscommunication.</p>
+          <ul class="check-list">
+            <li><i class="fas fa-check"></i> Reduce order errors by 90%</li>
+            <li><i class="fas fa-check"></i> Sync across multiple locations</li>
+            <li><i class="fas fa-check"></i> Live order status tracking</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 6: TESTIMONIALS (Framer: Fade In Up with Delay) -->
+    <section class="section-wrapper" id="testimonials">
+      <h2 class="section-title" style="text-align: center;">Loved by Restaurateurs</h2>
+      <p class="section-subtitle" style="margin: 0 auto 2rem; text-align: center;">Don't just take our word for it.</p>
+      
+      <div class="testimonial-container">
+        <div class="testimonial-card">
+          <div>
+            <div class="testimonial-head">
+              <div class="testimonial-stars" aria-label="5 out of 5 stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
+              <span class="testimonial-tag"><i class="fas fa-bolt"></i> Faster Weekend Service</span>
+            </div>
+            <p class="testimonial-text" style="margin-top: 1.25rem;">"ScanDine completely transformed our busy weekend service. The QR menus look incredible and the direct kitchen integration is flawless."</p>
+          </div>
+          <div class="testimonial-author">
+            <img src="images/index-avatar-sarah.jpg" alt="Sarah Jenkins, Owner, The Rustic Spoon">
+            <div>
+              <h4>Sarah Jenkins</h4>
+              <span>Owner, The Rustic Spoon</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="testimonial-card">
+          <div>
+            <div class="testimonial-head">
+              <div class="testimonial-stars" aria-label="5 out of 5 stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
+              <span class="testimonial-tag"><i class="fas fa-chart-line"></i> +20% Avg Order Value</span>
+            </div>
+            <p class="testimonial-text" style="margin-top: 1.25rem;">"We saw a 20% increase in average order value because the digital menu makes upselling so easy. Highly recommended!"</p>
+          </div>
+          <div class="testimonial-author">
+            <img src="images/index-avatar-marcus.jpg" alt="Marcus Chen, Manager, Bistro 42">
+            <div>
+              <h4>Marcus Chen</h4>
+              <span>Manager, Bistro 42</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 7: FINAL CTA (Framer: Zoom In) -->
+    <section class="cta-section">
+      <div class="cta-box">
+        <h2>Ready to Upgrade Your Restaurant?</h2>
+        <p>Join hundreds of modern restaurants using ScanDine today.</p>
+        <a href="#" class="cta-btn">Start Your Free Trial</a>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ========== FOOTER ========== -->
+  <footer class="footer">
+    <div class="footer__container">
+      <div class="footer__col">
+        <a href="#" class="footer__brand">Scan<span>Dine</span></a>
+        <p class="footer__desc">The ultimate QR code menu and contactless ordering system for modern restaurants. Fast, safe, and seamless.</p>
+        <div class="footer__socials">
+          <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+          <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+          <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+          <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+        </div>
+      </div>
+      <div class="footer__col">
+        <h3>Product</h3>
+        <ul class="footer__links">
+          <li><a href="#">Features</a></li>
+          <li><a href="#">Pricing Plans</a></li>
+          <li><a href="#">Demo Request</a></li>
+          <li><a href="#">Dashboard</a></li>
+        </ul>
+      </div>
+      <div class="footer__col">
+        <h3>Support</h3>
+        <ul class="footer__links">
+          <li><a href="#">Help Center</a></li>
+          <li><a href="contact.html">Contact Us</a></li>
+          <li><a href="#">Privacy Policy</a></li>
+          <li><a href="#">Terms of Service</a></li>
+        </ul>
+      </div>
+      <div class="footer__col footer__newsletter">
+        <h3>Stay Updated</h3>
+        <p>Subscribe to our newsletter for the latest updates and features.</p>
+        <form class="footer__form" onsubmit="event.preventDefault(); alert('Subscribed!');">
+          <input type="email" placeholder="Email address" required>
+          <button type="submit" aria-label="Subscribe"><i class="fas fa-paper-plane"></i></button>
+        </form>
+      </div>
+    </div>
+    <div class="footer__bottom">
+      <p>&copy; 2023 ScanDine. All rights reserved.</p>
+      <div class="footer__legal">
+        <a href="#">Privacy</a>
+        <a href="#">Terms</a>
+        <a href="#">Cookies</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Framer Motion Library (via ESM CDN) -->
+  <script type="module">
+    import { animate, inView, stagger } from "https://cdn.jsdelivr.net/npm/framer-motion@11.0.8/dom/+esm";
+
+    // SECTION 1: HERO - Unique Framer: Staggered Fade & Slide Up
+    inView("#hero", (info) => {
+      if (info.target) {
+        animate(".hero__content h1", { opacity: [0, 1], y: [30, 0] }, { duration: 0.8, ease: "easeOut" });
+        animate(".hero__content p", { opacity: [0, 1], y: [20, 0] }, { duration: 0.8, delay: 0.2, ease: "easeOut" });
+        animate(".hero__btn", { opacity: [0, 1], y: [20, 0] }, { duration: 0.8, delay: 0.4, ease: "easeOut" });
+        animate(".hero__image-wrapper img", { opacity: [0, 1], scale: [0.95, 1] }, { duration: 1, delay: 0.3, ease: "easeOut" });
+      }
+    });
+
+    // SECTION 2: STATS BANNER - Unique Framer: Slide Up with Stagger
+    inView(".stats-banner", (info) => {
+      if (info.target) {
+        animate(".stat-item", 
+          { opacity: [0, 1], y: [40, 0] }, 
+          { duration: 0.6, delay: stagger(0.15), ease: "backOut" }
+        );
+      }
+    });
+
+    // SECTION 3: HOW IT WORKS - Unique Framer: Slide Left & Right Alternating
+    inView("#how-it-works", (info) => {
+      if (info.target) {
+        // Odd steps slide from left
+        animate(".step:nth-child(odd) .step__content", { opacity: [0, 1], x: [-50, 0] }, { duration: 0.7, ease: "easeOut" });
+        animate(".step:nth-child(odd) .step__number", { opacity: [0, 1], scale: [0.5, 1] }, { duration: 0.6, delay: 0.2, ease: "backOut" });
+        
+        // Even steps slide from right
+        animate(".step:nth-child(even) .step__content", { opacity: [0, 1], x: [50, 0] }, { duration: 0.7, ease: "easeOut" });
+        animate(".step:nth-child(even) .step__number", { opacity: [0, 1], scale: [0.5, 1] }, { duration: 0.6, delay: 0.2, ease: "backOut" });
+      }
+    });
+
+    // SECTION 4: BENTO GRID - Unique Framer: Scale Up & Pop In
+    inView("#features .bento-grid", (info) => {
+      if (info.target) {
+        animate(".bento-card", 
+          { opacity: [0, 1], scale: [0.8, 1], y: [20, 0] }, 
+          { duration: 0.6, delay: stagger(0.1), ease: "backOut" }
+        );
+      }
+    });
+
+    // SECTION 5: SHOWCASE - Unique Framer: Image Reveal & Text Slide
+    inView("#showcase .showcase", (info) => {
+      if (info.target) {
+        animate(".showcase__img", { opacity: [0, 1], scale: [1.05, 1] }, { duration: 1, ease: "easeOut" });
+        animate(".showcase__content", { opacity: [0, 1], x: [30, 0] }, { duration: 0.8, delay: 0.3, ease: "easeOut" });
+        animate(".check-list li", { opacity: [0, 1], y: [10, 0] }, { duration: 0.5, delay: stagger(0.15), ease: "easeOut" });
+      }
+    });
+
+    // SECTION 6: TESTIMONIALS - Unique Framer: Fade Up with Stagger
+    inView("#testimonials", (info) => {
+      if (info.target) {
+        animate(".testimonial-card", 
+          { opacity: [0, 1], y: [40, 0] }, 
+          { duration: 0.8, delay: stagger(0.2), ease: "easeOut" }
+        );
+      }
+    });
+
+    // SECTION 7: CTA - Unique Framer: Zoom In
+    inView(".cta-box", (info) => {
+      if (info.target) {
+        animate(".cta-box", { opacity: [0, 1], scale: [0.9, 1] }, { duration: 0.8, ease: "backOut" });
+        animate(".cta-box h2", { opacity: [0, 1], y: [20, 0] }, { duration: 0.6, delay: 0.2, ease: "easeOut" });
+        animate(".cta-box p", { opacity: [0, 1], y: [20, 0] }, { duration: 0.6, delay: 0.3, ease: "easeOut" });
+        animate(".cta-btn", { opacity: [0, 1], scale: [0.8, 1] }, { duration: 0.5, delay: 0.5, ease: "backOut" });
+      }
+    });
+  </script>
+
+  <!-- ========== EXISTING NAVBAR/FOOTER LOGIC ========== -->
+  <script>
+    (function() {
+      const htmlElement = document.documentElement;
+
+      const desktopThemeToggle = document.getElementById('themeToggle');
+      const desktopRtlToggle = document.getElementById('rtlToggle');
+      const mobileThemeToggle = document.getElementById('mobileThemeToggle');
+      const mobileRtlToggle = document.getElementById('mobileRtlToggle');
+      
+      const themeIcons = [document.getElementById('themeIcon'), document.getElementById('mobileThemeIcon')];
+      
+      const hamburgerBtn = document.getElementById('hamburgerBtn');
+      const hamburgerIcon = document.getElementById('hamburgerIcon');
+      const mobileMenu = document.getElementById('mobileMenu');
+
+      function updateTheme(isDark) {
+        if (isDark) {
+          htmlElement.setAttribute('data-theme', 'dark');
+          themeIcons.forEach(icon => {
+            icon.classList.remove('fa-moon');
+            icon.classList.add('fa-sun');
+          });
+          localStorage.setItem('theme', 'dark');
+        } else {
+          htmlElement.removeAttribute('data-theme');
+          themeIcons.forEach(icon => {
+            icon.classList.remove('fa-sun');
+            icon.classList.add('fa-moon');
+          });
+          localStorage.setItem('theme', 'light');
+        }
+      }
+
+      if (localStorage.getItem('theme') === 'dark') updateTheme(true);
+
+      desktopThemeToggle.addEventListener('click', () => updateTheme(htmlElement.getAttribute('data-theme') !== 'dark'));
+      mobileThemeToggle.addEventListener('click', () => updateTheme(htmlElement.getAttribute('data-theme') !== 'dark'));
+
+      function updateDirection(isRtl) {
+        if (isRtl) {
+          htmlElement.setAttribute('dir', 'rtl');
+          localStorage.setItem('dir', 'rtl');
+        } else {
+          htmlElement.setAttribute('dir', 'ltr');
+          localStorage.setItem('dir', 'ltr');
+        }
+      }
+
+      if (localStorage.getItem('dir') === 'rtl') updateDirection(true);
+
+      desktopRtlToggle.addEventListener('click', () => updateDirection(htmlElement.getAttribute('dir') !== 'rtl'));
+      mobileRtlToggle.addEventListener('click', () => updateDirection(htmlElement.getAttribute('dir') !== 'rtl'));
+
+      const mobileBackdrop = document.createElement('div');
+      mobileBackdrop.className = 'mobile-backdrop';
+      document.body.appendChild(mobileBackdrop);
+      document.body.appendChild(mobileMenu);
+
+      if (!mobileMenu.querySelector('.mobile-drawer-header')) {
+        const drawerHeader = document.createElement('div');
+        drawerHeader.className = 'mobile-drawer-header';
+        drawerHeader.innerHTML = '<a href="index.html" class="navbar__brand">Scan<span>Dine</span></a><button type="button" class="mobile-drawer-close" aria-label="Close menu"><i class="fas fa-times"></i></button>';
+        mobileMenu.prepend(drawerHeader);
+      }
+      const drawerCloseBtn = mobileMenu.querySelector('.mobile-drawer-close');
+
+      function setMobileMenu(open) {
+        if (open) {
+          mobileMenu.classList.add('active');
+          mobileBackdrop.classList.add('active');
+          hamburgerIcon.classList.replace('fa-bars', 'fa-times');
+          document.body.style.overflow = 'hidden';
+        } else {
+          mobileMenu.classList.remove('active');
+          mobileBackdrop.classList.remove('active');
+          hamburgerIcon.classList.replace('fa-times', 'fa-bars');
+          document.body.style.overflow = '';
+        }
+      }
+
+      hamburgerBtn.addEventListener('click', () => setMobileMenu(!mobileMenu.classList.contains('active')));
+      if (drawerCloseBtn) drawerCloseBtn.addEventListener('click', () => setMobileMenu(false));
+      mobileBackdrop.addEventListener('click', () => setMobileMenu(false));
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && mobileMenu.classList.contains('active')) setMobileMenu(false);
+      });
+
+      const mobileSubLinks = document.querySelectorAll('.mobile-menu__link[data-submenu]');
+      mobileSubLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
+          e.preventDefault();
+          const targetId = link.getAttribute('data-submenu');
+          const submenu = document.getElementById(targetId);
+          
+          document.querySelectorAll('.mobile-submenu').forEach(sm => {
+            if (sm.id !== targetId) sm.classList.remove('open');
+          });
+
+          submenu.classList.toggle('open');
+          const chevron = link.querySelector('i');
+          if (chevron) {
+            chevron.style.transform = submenu.classList.contains('open') ? 'rotate(180deg)' : 'rotate(0deg)';
+          }
+        });
+      });
+
+      window.addEventListener('resize', () => {
+        if (window.innerWidth > 992 && mobileMenu.classList.contains('active')) {
+          setMobileMenu(false);
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

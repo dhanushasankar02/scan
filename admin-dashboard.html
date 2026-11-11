@@ -1,0 +1,1322 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ScanDine | Admin Dashboard</title>
+  <link rel="icon" type="image/svg+xml" href="images/favicon.svg">
+  <link rel="icon" type="image/png" href="images/favicon.png">
+  <link rel="shortcut icon" href="favicon.ico">
+  <link rel="apple-touch-icon" href="images/favicon.png">
+  <!-- Font Awesome 6 (free) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+  <style>
+    /* ----- GLOBAL RESET & SCANDINE THEME TOKENS ----- */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg-app: #f4f6fa;
+      --surface-color: #ffffff;
+      --surface-alt: #f1f5f9;
+      --sidebar-bg: #ffffff;
+      --text-primary: #1e1e2f;
+      --text-secondary: #525270;
+      --accent: #f97316;
+      --accent-hover: #ea580c;
+      --accent-soft: rgba(249, 115, 22, 0.12);
+      --border-light: #e5e7ef;
+      --success: #10b981;
+      --success-soft: rgba(16, 185, 129, 0.14);
+      --warning: #f59e0b;
+      --warning-soft: rgba(245, 158, 11, 0.14);
+      --danger: #ef4444;
+      --danger-soft: rgba(239, 68, 68, 0.14);
+      --shadow-sm: 0 4px 20px rgba(15, 23, 42, 0.05);
+      --shadow-md: 0 14px 34px -14px rgba(15, 23, 42, 0.12);
+      --transition: all 0.2s ease;
+    }
+
+    html[data-theme="dark"] {
+      --bg-app: #0b0b12;
+      --surface-color: #161623;
+      --surface-alt: #10101a;
+      --sidebar-bg: #12121d;
+      --text-primary: #f0f0f5;
+      --text-secondary: #a4a4bc;
+      --accent: #fb923c;
+      --accent-hover: #f97316;
+      --accent-soft: rgba(251, 146, 60, 0.16);
+      --border-light: #262638;
+      --shadow-sm: 0 4px 20px rgba(0, 0, 0, 0.35);
+      --shadow-md: 0 18px 40px -16px rgba(0, 0, 0, 0.55);
+    }
+
+    body {
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+      background-color: var(--bg-app);
+      color: var(--text-primary);
+      transition: background-color 0.25s, color 0.25s;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    .mono {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
+
+    /* =========================================
+       APP SHELL (NO NAVBAR / NO FOOTER)
+       ========================================= */
+    .app-shell {
+      display: grid;
+      grid-template-columns: 268px 1fr;
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      background: var(--sidebar-bg);
+      border-right: 1px solid var(--border-light);
+      padding: 1.5rem 1.15rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      z-index: 200;
+      transition: transform 0.25s ease, background-color 0.25s;
+    }
+
+    html[dir="rtl"] .sidebar {
+      border-right: none;
+      border-left: 1px solid var(--border-light);
+    }
+
+    .sidebar__top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 0.35rem;
+    }
+
+    .brand {
+      font-size: 1.55rem;
+      font-weight: 800;
+      letter-spacing: -0.025em;
+      color: var(--text-primary);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      line-height: 1;
+    }
+
+    .brand span { color: var(--accent); }
+
+    .brand-tag {
+      font-size: 0.68rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      background: var(--accent-soft);
+      color: var(--accent);
+      padding: 0.22rem 0.55rem;
+      border-radius: 999px;
+    }
+
+    .sidebar-close {
+      display: none;
+      background: transparent;
+      border: none;
+      color: var(--text-secondary);
+      font-size: 1.25rem;
+      cursor: pointer;
+    }
+
+    .side-nav {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+      flex: 1;
+    }
+
+    .side-link {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.78rem 1rem;
+      border-radius: 0.85rem;
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--text-secondary);
+      font-family: inherit;
+      font-size: 0.92rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: left;
+      transition: var(--transition);
+    }
+
+    html[dir="rtl"] .side-link { text-align: right; }
+
+    .side-link__left {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      min-width: 0;
+    }
+
+    .side-link i {
+      width: 1.25rem;
+      flex-shrink: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      font-size: 0.98rem;
+    }
+
+    .side-link:hover {
+      background: var(--surface-alt);
+      color: var(--text-primary);
+    }
+
+    .side-link.active {
+      background: var(--accent-soft);
+      border-color: rgba(249, 115, 22, 0.3);
+      color: var(--accent);
+    }
+
+    .side-badge {
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 0.15rem 0.5rem;
+      border-radius: 999px;
+      background: var(--accent);
+      color: #ffffff;
+    }
+
+    .sidebar__footer {
+      border-top: 1px solid var(--border-light);
+      padding-top: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .user-chip {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.4rem 0.25rem;
+    }
+
+    .user-avatar {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: var(--accent);
+      color: #ffffff;
+      font-weight: 800;
+      font-size: 0.88rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .user-chip strong {
+      display: block;
+      font-size: 0.9rem;
+    }
+
+    .user-chip span {
+      display: block;
+      font-size: 0.76rem;
+      color: var(--text-secondary);
+    }
+
+    .sidebar-prefs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.55rem;
+    }
+
+    .sidebar-pref-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.45rem;
+      padding: 0.58rem 0.65rem;
+      border-radius: 0.75rem;
+      border: 1px solid var(--border-light);
+      background: var(--surface-alt);
+      color: var(--text-primary);
+      font-family: inherit;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .sidebar-pref-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .back-home-link {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.65rem 0.9rem;
+      border-radius: 0.75rem;
+      border: 1px solid var(--border-light);
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 0.84rem;
+      font-weight: 600;
+      transition: var(--transition);
+    }
+
+    .back-home-link:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    /* WORKSPACE HEADER + MAIN */
+    .workspace {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    .topbar {
+      padding: 1.1rem 2rem;
+      border-bottom: 1px solid var(--border-light);
+      background: var(--surface-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 0.9rem;
+    }
+
+    .menu-toggle-btn {
+      display: none;
+      background: var(--surface-alt);
+      border: 1px solid var(--border-light);
+      color: var(--text-primary);
+      width: 2.35rem;
+      height: 2.35rem;
+      border-radius: 0.65rem;
+      cursor: pointer;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.05rem;
+    }
+
+    .topbar-title h1 {
+      font-size: 1.25rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .topbar-title p {
+      font-size: 0.82rem;
+      color: var(--text-secondary);
+    }
+
+    .status-toggle-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.6rem 1.05rem;
+      border-radius: 0.75rem;
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      background: var(--success-soft);
+      color: var(--success);
+      font-family: inherit;
+      font-size: 0.85rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .status-toggle-btn.paused {
+      border-color: rgba(239, 68, 68, 0.35);
+      background: var(--danger-soft);
+      color: var(--danger);
+    }
+
+    /* MAIN CONTENT VIEWS */
+    .dash-content {
+      padding: 1.75rem 2rem 2.5rem;
+      max-width: 1280px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    .dash-view { display: none; }
+    .dash-view.active { display: block; }
+
+    /* KPI GRID */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1.15rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .kpi-card {
+      background: var(--surface-color);
+      border: 1px solid var(--border-light);
+      border-radius: 1.25rem;
+      padding: 1.2rem 1.3rem;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .kpi-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.75rem;
+      color: var(--text-secondary);
+      font-size: 0.82rem;
+      font-weight: 600;
+    }
+
+    .kpi-icon {
+      width: 2rem;
+      height: 2rem;
+      border-radius: 0.6rem;
+      background: var(--accent-soft);
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+    }
+
+    .kpi-value {
+      font-size: 1.65rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.2rem;
+    }
+
+    .kpi-sub {
+      font-size: 0.78rem;
+      color: var(--text-secondary);
+    }
+
+    .overview-grid {
+      display: grid;
+      grid-template-columns: 1.35fr 0.85fr;
+      gap: 1.35rem;
+      align-items: start;
+    }
+
+    .panel {
+      background: var(--surface-color);
+      border: 1px solid var(--border-light);
+      border-radius: 1.35rem;
+      padding: 1.45rem;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .panel-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1.15rem;
+      flex-wrap: wrap;
+    }
+
+    .panel-head h2 {
+      font-size: 1.08rem;
+      font-weight: 800;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      font-size: 0.74rem;
+      font-weight: 700;
+      padding: 0.28rem 0.7rem;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .pill.prep { background: var(--warning-soft); color: var(--warning); }
+    .pill.ready { background: var(--success-soft); color: var(--success); }
+    .pill.off { background: var(--danger-soft); color: var(--danger); }
+
+    .list-stack {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .row-card {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      padding: 0.85rem 1rem;
+      border-radius: 0.95rem;
+      background: var(--surface-alt);
+      border: 1px solid var(--border-light);
+      font-size: 0.88rem;
+    }
+
+    .row-card strong { display: block; margin-bottom: 0.15rem; }
+    .row-card span { font-size: 0.78rem; color: var(--text-secondary); }
+
+    .btn-sm {
+      padding: 0.52rem 0.9rem;
+      border-radius: 0.7rem;
+      border: 1px solid var(--border-light);
+      background: var(--surface-color);
+      color: var(--text-primary);
+      font-family: inherit;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: var(--transition);
+      white-space: nowrap;
+    }
+
+    .btn-sm:hover { border-color: var(--accent); color: var(--accent); }
+    .btn-sm.primary { background: var(--accent); border-color: var(--accent); color: #ffffff; }
+    .btn-sm.primary:hover { background: var(--accent-hover); color: #ffffff; }
+
+    /* TOP SELLERS BARS */
+    .bar-row {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+
+    .bar-labels {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 0.75rem;
+      font-size: 0.84rem;
+      font-weight: 600;
+    }
+
+    .bar-labels span:last-child {
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .bar-track {
+      height: 8px;
+      border-radius: 999px;
+      background: var(--surface-alt);
+      overflow: hidden;
+    }
+
+    .bar-fill {
+      height: 100%;
+      border-radius: 999px;
+      background: var(--accent);
+    }
+
+    /* KDS FILTER BAR & TABLE */
+    .filter-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.85rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .pill-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .filter-pill {
+      padding: 0.48rem 0.95rem;
+      border-radius: 999px;
+      border: 1px solid var(--border-light);
+      background: var(--surface-color);
+      color: var(--text-secondary);
+      font-family: inherit;
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .filter-pill.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #ffffff;
+    }
+
+    .kds-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.15rem;
+    }
+
+    .kds-card {
+      background: var(--surface-color);
+      border: 1px solid var(--border-light);
+      border-radius: 1.25rem;
+      padding: 1.25rem;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+    }
+
+    .kds-card.is-hidden { display: none; }
+
+    .kds-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .kds-items {
+      font-size: 0.86rem;
+      color: var(--text-secondary);
+      line-height: 1.55;
+      flex: 1;
+    }
+
+    /* MENU MANAGER */
+    .add-dish-form {
+      display: grid;
+      grid-template-columns: 1.4fr 0.9fr 0.7fr auto;
+      gap: 0.75rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .input-ctrl {
+      width: 100%;
+      padding: 0.72rem 0.9rem;
+      border-radius: 0.75rem;
+      border: 1px solid var(--border-light);
+      background: var(--surface-alt);
+      color: var(--text-primary);
+      font-family: inherit;
+      font-size: 0.88rem;
+      outline: none;
+    }
+
+    .input-ctrl:focus { border-color: var(--accent); }
+
+    .table-wrap { overflow-x: auto; }
+
+    .admin-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.88rem;
+    }
+
+    .admin-table th,
+    .admin-table td {
+      text-align: left;
+      padding: 0.85rem 0.75rem;
+      border-bottom: 1px solid var(--border-light);
+    }
+
+    html[dir="rtl"] .admin-table th,
+    html[dir="rtl"] .admin-table td { text-align: right; }
+
+    .admin-table th {
+      font-size: 0.76rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-secondary);
+    }
+
+    /* QR GENERATOR */
+    .qr-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.35rem;
+      align-items: start;
+    }
+
+    .qr-preview-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 0.9rem;
+      padding: 1.5rem;
+      border-radius: 1.2rem;
+      background: var(--surface-alt);
+      border: 1px solid var(--border-light);
+    }
+
+    .qr-svg-frame {
+      width: 168px;
+      height: 168px;
+      background: #ffffff;
+      padding: 12px;
+      border-radius: 1rem;
+      border: 2px solid var(--accent);
+    }
+
+    .toast-msg {
+      position: fixed;
+      bottom: 1.5rem;
+      right: 1.5rem;
+      background: var(--text-primary);
+      color: var(--surface-color);
+      padding: 0.8rem 1.2rem;
+      border-radius: 0.85rem;
+      font-size: 0.86rem;
+      font-weight: 700;
+      box-shadow: var(--shadow-md);
+      opacity: 0;
+      transform: translateY(12px);
+      pointer-events: none;
+      transition: all 0.22s ease;
+      z-index: 500;
+    }
+
+    html[dir="rtl"] .toast-msg { right: auto; left: 1.5rem; }
+    .toast-msg.show { opacity: 1; transform: translateY(0); }
+
+    .sidebar-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 150;
+    }
+
+    @media screen and (max-width: 1080px) {
+      .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+      .overview-grid,
+      .qr-grid { grid-template-columns: 1fr; }
+      .kds-grid { grid-template-columns: repeat(2, 1fr); }
+      .add-dish-form { grid-template-columns: 1fr 1fr; }
+    }
+
+    @media screen and (max-width: 860px) {
+      .app-shell { grid-template-columns: 1fr; }
+      .sidebar {
+        position: fixed;
+        left: 0;
+        top: 0;
+        width: 272px;
+        transform: translateX(-100%);
+      }
+      html[dir="rtl"] .sidebar {
+        left: auto;
+        right: 0;
+        transform: translateX(100%);
+      }
+      .sidebar.open { transform: translateX(0); }
+      .sidebar-backdrop.open { display: block; }
+      .sidebar-close { display: block; }
+      .menu-toggle-btn { display: flex; }
+      .dash-content { padding: 1.25rem; }
+      .topbar { padding: 1rem 1.25rem; }
+    }
+
+    @media screen and (max-width: 600px) {
+      .kpi-grid,
+      .kds-grid,
+      .add-dish-form { grid-template-columns: 1fr; }
+      .status-toggle-btn span { display: none; }
+      .row-card { flex-direction: column; align-items: stretch; gap: 0.75rem; }
+      .row-card > div:last-child { width: 100%; justify-content: space-between; flex-wrap: wrap; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+  <div class="app-shell">
+    <!-- APP SIDEBAR -->
+    <aside class="sidebar" id="appSidebar" aria-label="Admin dashboard navigation">
+      <div class="sidebar__top">
+        <a href="index.html" class="brand">Scan<span>Dine</span></a>
+        <span class="brand-tag">Admin</span>
+        <button type="button" class="sidebar-close" id="sidebarCloseBtn" aria-label="Close sidebar">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <ul class="side-nav" role="tablist">
+        <li>
+          <button type="button" class="side-link active" data-view="overview">
+            <span class="side-link__left"><i class="fas fa-chart-line"></i> Overview</span>
+          </button>
+        </li>
+        <li>
+          <button type="button" class="side-link" data-view="orders">
+            <span class="side-link__left"><i class="fas fa-receipt"></i> Live Orders</span>
+            <span class="side-badge" id="kdsBadgeCount">3</span>
+          </button>
+        </li>
+        <li>
+          <button type="button" class="side-link" data-view="menu">
+            <span class="side-link__left"><i class="fas fa-utensils"></i> Menu Manager</span>
+          </button>
+        </li>
+        <li>
+          <button type="button" class="side-link" data-view="qr">
+            <span class="side-link__left"><i class="fas fa-qrcode"></i> QR Table Codes</span>
+          </button>
+        </li>
+        <li>
+          <button type="button" class="side-link" data-view="printers">
+            <span class="side-link__left"><i class="fas fa-print"></i> Kitchen Printers</span>
+          </button>
+        </li>
+      </ul>
+
+      <div class="sidebar__footer">
+        <div class="user-chip">
+          <div class="user-avatar">MB</div>
+          <div>
+            <strong>Marco Bellini</strong>
+            <span>Owner &bull; Trattoria Sol</span>
+          </div>
+        </div>
+        <div class="sidebar-prefs">
+          <button type="button" class="sidebar-pref-btn" id="themeToggle" aria-label="Toggle dark mode">
+            <i class="fas fa-moon" id="themeIcon"></i>
+            <span>Theme</span>
+          </button>
+          <button type="button" class="sidebar-pref-btn" id="rtlToggle" aria-label="Toggle RTL/LTR">
+            <i class="fas fa-arrow-right-arrow-left"></i>
+            <span>RTL/LTR</span>
+          </button>
+        </div>
+        <a href="index.html" class="back-home-link">
+          <i class="fas fa-arrow-left"></i> Back to ScanDine Site
+        </a>
+      </div>
+    </aside>
+
+    <!-- MAIN WORKSPACE -->
+    <div class="workspace">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button type="button" class="menu-toggle-btn" id="openSidebarBtn" aria-label="Open sidebar">
+            <i class="fas fa-bars"></i>
+          </button>
+          <div class="topbar-title">
+            <h1 id="viewHeading">Restaurant Overview</h1>
+            <p id="viewSubheading">Trattoria Sol &bull; Live QR Service</p>
+          </div>
+        </div>
+
+        <button type="button" class="status-toggle-btn" id="pauseOrderingBtn">
+          <i class="fas fa-check-circle"></i>
+          <span>QR Ordering Live</span>
+        </button>
+      </header>
+
+      <main class="dash-content">
+        <!-- VIEW 1: OVERVIEW -->
+        <section class="dash-view active" id="view-overview">
+          <div class="kpi-grid">
+            <article class="kpi-card">
+              <div class="kpi-top">
+                <span>Today's Revenue</span>
+                <span class="kpi-icon"><i class="fas fa-dollar-sign"></i></span>
+              </div>
+              <div class="kpi-value">$2,480</div>
+              <div class="kpi-sub">+18% vs last Friday</div>
+            </article>
+            <article class="kpi-card">
+              <div class="kpi-top">
+                <span>Open Tickets</span>
+                <span class="kpi-icon"><i class="fas fa-receipt"></i></span>
+              </div>
+              <div class="kpi-value" id="kpiOpenCount">3</div>
+              <div class="kpi-sub">Active in kitchen queue</div>
+            </article>
+            <article class="kpi-card">
+              <div class="kpi-top">
+                <span>Avg Prep Time</span>
+                <span class="kpi-icon"><i class="fas fa-clock"></i></span>
+              </div>
+              <div class="kpi-value">9 min</div>
+              <div class="kpi-sub">Target SLA: &lt; 12 min</div>
+            </article>
+            <article class="kpi-card">
+              <div class="kpi-top">
+                <span>QR Scans Today</span>
+                <span class="kpi-icon"><i class="fas fa-qrcode"></i></span>
+              </div>
+              <div class="kpi-value">342</div>
+              <div class="kpi-sub">12 active tables</div>
+            </article>
+          </div>
+
+          <div class="overview-grid">
+            <article class="panel">
+              <div class="panel-head">
+                <h2>Active Kitchen Queue</h2>
+                <button type="button" class="btn-sm" data-jump="orders">Open Full KDS</button>
+              </div>
+              <ul class="list-stack" id="overviewQueueList"></ul>
+            </article>
+
+            <article class="panel">
+              <div class="panel-head">
+                <h2>Top Ordered Today</h2>
+              </div>
+              <div class="list-stack">
+                <div class="bar-row">
+                  <div class="bar-labels"><span>Truffle Mushroom Risotto</span><span>46 orders</span></div>
+                  <div class="bar-track"><div class="bar-fill" style="width: 88%;"></div></div>
+                </div>
+                <div class="bar-row">
+                  <div class="bar-labels"><span>Herb Grilled Sea Bass</span><span>34 orders</span></div>
+                  <div class="bar-track"><div class="bar-fill" style="width: 66%;"></div></div>
+                </div>
+                <div class="bar-row">
+                  <div class="bar-labels"><span>Burrata &amp; Fig Flatbread</span><span>29 orders</span></div>
+                  <div class="bar-track"><div class="bar-fill" style="width: 56%;"></div></div>
+                </div>
+                <div class="bar-row">
+                  <div class="bar-labels"><span>Roasted Cauliflower Bowl</span><span>19 orders</span></div>
+                  <div class="bar-track"><div class="bar-fill" style="width: 38%;"></div></div>
+                </div>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <!-- VIEW 2: LIVE ORDERS (KDS) -->
+        <section class="dash-view" id="view-orders">
+          <div class="filter-bar">
+            <div class="pill-group" id="kdsFilterGroup">
+              <button type="button" class="filter-pill active" data-status="all">All Tickets</button>
+              <button type="button" class="filter-pill" data-status="new">New</button>
+              <button type="button" class="filter-pill" data-status="preparing">Preparing</button>
+              <button type="button" class="filter-pill" data-status="ready">Ready</button>
+            </div>
+          </div>
+          <div class="kds-grid" id="kdsGrid"></div>
+        </section>
+
+        <!-- VIEW 3: MENU MANAGER -->
+        <section class="dash-view" id="view-menu">
+          <article class="panel">
+            <div class="panel-head">
+              <h2>Menu Catalog &amp; 86 Availability</h2>
+              <span class="mono" style="font-size: 0.78rem; color: var(--text-secondary);">INSTANT QR SYNC</span>
+            </div>
+
+            <form class="add-dish-form" id="addDishForm">
+              <input type="text" class="input-ctrl" id="newDishName" placeholder="Dish name (e.g. Lemon Tart)" required>
+              <select class="input-ctrl" id="newDishCat">
+                <option value="Mains">Mains</option>
+                <option value="Starters">Starters</option>
+                <option value="Drinks">Drinks</option>
+                <option value="Desserts">Desserts</option>
+              </select>
+              <input type="number" step="0.5" min="1" class="input-ctrl" id="newDishPrice" placeholder="Price ($)" required>
+              <button type="submit" class="btn-sm primary"><i class="fas fa-plus"></i> Add Item</button>
+            </form>
+
+            <div class="table-wrap">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Dish Name</th>
+                    <th>Category</th>
+                    <th>Price</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="menuTableBody"></tbody>
+              </table>
+            </div>
+          </article>
+        </section>
+
+        <!-- VIEW 4: QR TABLE CODES -->
+        <section class="dash-view" id="view-qr">
+          <div class="qr-grid">
+            <article class="panel">
+              <div class="panel-head">
+                <h2>Generate Table QR Code</h2>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 1rem;">
+                <div>
+                  <label for="qrTableInput" style="display: block; font-size: 0.85rem; font-weight: 700; margin-bottom: 0.4rem;">Table Number / Label</label>
+                  <input type="text" class="input-ctrl" id="qrTableInput" value="Table 07" placeholder="e.g. Table 14 or Patio 02">
+                </div>
+                <div>
+                  <label for="qrMenuMode" style="display: block; font-size: 0.85rem; font-weight: 700; margin-bottom: 0.4rem;">Assigned Menu</label>
+                  <select class="input-ctrl" id="qrMenuMode">
+                    <option value="Dinner & Drinks">Dinner &amp; Drinks</option>
+                    <option value="Lunch Express">Lunch Express</option>
+                    <option value="Weekend Brunch">Weekend Brunch</option>
+                  </select>
+                </div>
+                <div style="display: flex; gap: 0.65rem; flex-wrap: wrap;">
+                  <button type="button" class="btn-sm primary" id="copyQrLinkBtn"><i class="far fa-copy"></i> Copy Table URL</button>
+                  <button type="button" class="btn-sm" id="printQrBtn"><i class="fas fa-print"></i> Queue Print Sheet</button>
+                </div>
+              </div>
+            </article>
+
+            <article class="panel">
+              <div class="qr-preview-box">
+                <span class="pill mono" id="qrTableBadge">TABLE 07</span>
+                <svg class="qr-svg-frame" id="adminQrSvg" viewBox="0 0 29 29" aria-hidden="true"></svg>
+                <strong id="qrMenuLabel">Dinner &amp; Drinks</strong>
+                <span class="mono" id="qrUrlPreview" style="font-size: 0.78rem; color: var(--text-secondary);">https://scandine.io/sol/table-07</span>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <!-- VIEW 5: KITCHEN PRINTERS -->
+        <section class="dash-view" id="view-printers">
+          <article class="panel">
+            <div class="panel-head">
+              <h2>Thermal Printers &amp; KDS Stations</h2>
+            </div>
+            <ul class="list-stack">
+              <li class="row-card">
+                <div>
+                  <strong>Hot Kitchen Pass &mdash; Star TSP143III (LAN)</strong>
+                  <span>IP 192.168.1.42 &bull; Auto-cut enabled</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 0.6rem;">
+                  <span class="pill ready">Online</span>
+                  <button type="button" class="btn-sm test-print-btn" data-printer="Hot Kitchen Pass">Test Print</button>
+                </div>
+              </li>
+              <li class="row-card">
+                <div>
+                  <strong>Bar &amp; Beverage Station &mdash; Epson TM-T88VI</strong>
+                  <span>IP 192.168.1.48 &bull; Split-ticket filter: Drinks</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 0.6rem;">
+                  <span class="pill ready">Online</span>
+                  <button type="button" class="btn-sm test-print-btn" data-printer="Bar Station">Test Print</button>
+                </div>
+              </li>
+              <li class="row-card">
+                <div>
+                  <strong>Patio Expediter Tablet &mdash; Backup KDS</strong>
+                  <span>Failover mirror active</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 0.6rem;">
+                  <span class="pill ready">Synced</span>
+                  <button type="button" class="btn-sm test-print-btn" data-printer="Patio KDS">Ping Tablet</button>
+                </div>
+              </li>
+            </ul>
+          </article>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <div class="toast-msg" id="toastMsg" role="status" aria-live="polite"></div>
+
+  <script>
+    (function() {
+      /* ----- THEME, RTL & MOBILE SIDEBAR ----- */
+      const htmlEl = document.documentElement;
+      const themeToggle = document.getElementById('themeToggle');
+      const themeIcon = document.getElementById('themeIcon');
+      const rtlToggle = document.getElementById('rtlToggle');
+      const appSidebar = document.getElementById('appSidebar');
+      const sidebarBackdrop = document.getElementById('sidebarBackdrop');
+
+      function applyTheme(dark) {
+        if (dark) {
+          htmlEl.setAttribute('data-theme', 'dark');
+          themeIcon.classList.replace('fa-moon', 'fa-sun');
+          localStorage.setItem('theme', 'dark');
+        } else {
+          htmlEl.removeAttribute('data-theme');
+          themeIcon.classList.replace('fa-sun', 'fa-moon');
+          localStorage.setItem('theme', 'light');
+        }
+      }
+      if (localStorage.getItem('theme') === 'dark') applyTheme(true);
+      themeToggle.addEventListener('click', () => applyTheme(htmlEl.getAttribute('data-theme') !== 'dark'));
+
+      function applyDir(rtl) {
+        htmlEl.setAttribute('dir', rtl ? 'rtl' : 'ltr');
+        localStorage.setItem('dir', rtl ? 'rtl' : 'ltr');
+      }
+      if (localStorage.getItem('dir') === 'rtl') applyDir(true);
+      rtlToggle.addEventListener('click', () => applyDir(htmlEl.getAttribute('dir') !== 'rtl'));
+
+      function toggleSidebar(open) {
+        appSidebar.classList.toggle('open', open);
+        sidebarBackdrop.classList.toggle('open', open);
+      }
+      document.getElementById('openSidebarBtn').addEventListener('click', () => toggleSidebar(true));
+      document.getElementById('sidebarCloseBtn').addEventListener('click', () => toggleSidebar(false));
+      sidebarBackdrop.addEventListener('click', () => toggleSidebar(false));
+
+      const toastEl = document.getElementById('toastMsg');
+      let toastTimer = null;
+      function showToast(msg) {
+        toastEl.textContent = msg;
+        toastEl.classList.add('show');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => toastEl.classList.remove('show'), 2400);
+      }
+
+      /* ----- VIEW NAVIGATION ----- */
+      const viewMeta = {
+        overview: { title: 'Restaurant Overview', sub: 'Trattoria Sol • Live QR Service' },
+        orders: { title: 'Live Kitchen Orders', sub: 'Tap any ticket to advance prep status' },
+        menu: { title: 'Menu Manager', sub: 'Toggle availability or add items to live QR menus' },
+        qr: { title: 'QR Table Codes', sub: 'Generate serialized table links and print proofs' },
+        printers: { title: 'Kitchen Printers & KDS', sub: 'Monitor thermal spoolers and tablet failover' }
+      };
+
+      const viewHeading = document.getElementById('viewHeading');
+      const viewSubheading = document.getElementById('viewSubheading');
+
+      function switchView(name) {
+        document.querySelectorAll('.side-link').forEach(b => b.classList.toggle('active', b.dataset.view === name));
+        document.querySelectorAll('.dash-view').forEach(v => v.classList.toggle('active', v.id === 'view-' + name));
+        if (viewMeta[name]) {
+          viewHeading.textContent = viewMeta[name].title;
+          viewSubheading.textContent = viewMeta[name].sub;
+        }
+        toggleSidebar(false);
+      }
+
+      document.querySelectorAll('.side-link').forEach(btn => btn.addEventListener('click', () => switchView(btn.dataset.view)));
+      document.querySelectorAll('[data-jump]').forEach(btn => btn.addEventListener('click', () => switchView(btn.dataset.jump)));
+
+      /* ----- PAUSE / RESUME QR ORDERING ----- */
+      const pauseOrderingBtn = document.getElementById('pauseOrderingBtn');
+      let orderingLive = true;
+      pauseOrderingBtn.addEventListener('click', () => {
+        orderingLive = !orderingLive;
+        pauseOrderingBtn.classList.toggle('paused', !orderingLive);
+        pauseOrderingBtn.innerHTML = orderingLive
+          ? '<i class="fas fa-check-circle"></i><span>QR Ordering Live</span>'
+          : '<i class="fas fa-pause-circle"></i><span>Ordering Paused</span>';
+        showToast(orderingLive ? 'QR ordering resumed across all tables.' : 'QR ordering paused (menu browse-only mode).');
+      });
+
+      /* ----- LIVE ORDERS (KDS) ----- */
+      const orders = [
+        { id: '#SD-4091', table: 'Table 07', items: '1x Truffle Mushroom Risotto, 1x Burrata Flatbread', total: 44.50, status: 'preparing', ago: '4m ago' },
+        { id: '#SD-4092', table: 'Table 03', items: '2x Herb Grilled Sea Bass, 1x Cauliflower Bowl', total: 77.00, status: 'new', ago: '1m ago' },
+        { id: '#SD-4090', table: 'Patio 02', items: '1x Burrata & Fig Flatbread', total: 18.50, status: 'ready', ago: '9m ago' }
+      ];
+      let kdsFilter = 'all';
+
+      function statusBadgeHtml(status) {
+        if (status === 'new') return '<span class="pill">New Order</span>';
+        if (status === 'preparing') return '<span class="pill prep">Preparing</span>';
+        return '<span class="pill ready">Ready</span>';
+      }
+
+      function nextActionLabel(status) {
+        if (status === 'new') return 'Start Prep';
+        if (status === 'preparing') return 'Mark Ready';
+        return 'Complete';
+      }
+
+      function renderOrders() {
+        const kdsGrid = document.getElementById('kdsGrid');
+        const overviewQueueList = document.getElementById('overviewQueueList');
+        document.getElementById('kdsBadgeCount').textContent = String(orders.length);
+        document.getElementById('kpiOpenCount').textContent = String(orders.length);
+
+        overviewQueueList.innerHTML = orders.length ? orders.map(o =>
+          '<li class="row-card"><div><strong>' + o.table + ' &bull; ' + o.id + '</strong><span>' + o.items + '</span></div>' +
+          '<div style="display:flex;align-items:center;gap:0.6rem;">' + statusBadgeHtml(o.status) +
+          '<button type="button" class="btn-sm primary" onclick="window.advanceOrder(\'' + o.id + '\')">' + nextActionLabel(o.status) + '</button></div></li>'
+        ).join('') : '<li class="row-card"><span>All kitchen tickets completed!</span></li>';
+
+        kdsGrid.innerHTML = orders.length ? orders.map(o => {
+          const hideCls = (kdsFilter === 'all' || o.status === kdsFilter) ? '' : ' is-hidden';
+          return '<article class="kds-card' + hideCls + '">' +
+            '<div class="kds-top"><strong>' + o.table + ' <span class="mono" style="color:var(--text-secondary);font-size:0.8rem;">' + o.id + '</span></strong>' + statusBadgeHtml(o.status) + '</div>' +
+            '<p class="kds-items">' + o.items + '</p>' +
+            '<div style="display:flex;justify-content:space-between;align-items:center;">' +
+            '<span class="mono" style="font-size:0.8rem;color:var(--text-secondary);">' + o.ago + ' &bull; $' + o.total.toFixed(2) + '</span>' +
+            '<button type="button" class="btn-sm primary" onclick="window.advanceOrder(\'' + o.id + '\')">' + nextActionLabel(o.status) + '</button></div></article>';
+        }).join('') : '<article class="kds-card"><p class="kds-items">No active tickets in the queue.</p></article>';
+      }
+
+      window.advanceOrder = function(id) {
+        const idx = orders.findIndex(o => o.id === id);
+        if (idx === -1) return;
+        const o = orders[idx];
+        if (o.status === 'new') { o.status = 'preparing'; showToast(o.id + ' moved to Preparing.'); }
+        else if (o.status === 'preparing') { o.status = 'ready'; showToast(o.id + ' ready for runner!'); }
+        else { orders.splice(idx, 1); showToast(o.id + ' completed & archived.'); }
+        renderOrders();
+      };
+
+      document.querySelectorAll('#kdsFilterGroup .filter-pill').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('#kdsFilterGroup .filter-pill').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          kdsFilter = btn.dataset.status;
+          renderOrders();
+        });
+      });
+
+      /* ----- MENU MANAGER ----- */
+      const menuItems = [
+        { id: 1, name: 'Truffle Wild Mushroom Risotto', cat: 'Mains', price: 26.00, active: true },
+        { id: 2, name: 'Herb Grilled Sea Bass', cat: 'Mains', price: 29.00, active: true },
+        { id: 3, name: 'Burrata & Fig Flatbread', cat: 'Starters', price: 18.50, active: true },
+        { id: 4, name: 'Roasted Cauliflower Bowl', cat: 'Mains', price: 19.00, active: false }
+      ];
+
+      function renderMenuTable() {
+        const tbody = document.getElementById('menuTableBody');
+        tbody.innerHTML = menuItems.map(item =>
+          '<tr><td><strong>' + item.name + '</strong></td><td>' + item.cat + '</td><td>$' + item.price.toFixed(2) + '</td>' +
+          '<td><span class="pill ' + (item.active ? 'ready' : 'off') + '">' + (item.active ? 'Available' : '86\'d') + '</span></td>' +
+          '<td style="display:flex;gap:0.45rem;">' +
+          '<button type="button" class="btn-sm" onclick="window.toggleMenuItem(' + item.id + ')">' + (item.active ? 'Mark 86\'d' : 'Enable') + '</button>' +
+          '<button type="button" class="btn-sm" onclick="window.deleteMenuItem(' + item.id + ')" aria-label="Delete"><i class="fas fa-trash"></i></button></td></tr>'
+        ).join('');
+      }
+
+      window.toggleMenuItem = function(id) {
+        const item = menuItems.find(m => m.id === id);
+        if (!item) return;
+        item.active = !item.active;
+        renderMenuTable();
+        showToast(item.name + (item.active ? ' enabled on QR menu.' : ' marked unavailable (86\'d).'));
+      };
+
+      window.deleteMenuItem = function(id) {
+        const idx = menuItems.findIndex(m => m.id === id);
+        if (idx === -1) return;
+        const removed = menuItems.splice(idx, 1)[0];
+        renderMenuTable();
+        showToast('Removed ' + removed.name + ' from menu.');
+      };
+
+      document.getElementById('addDishForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const nameEl = document.getElementById('newDishName');
+        const catEl = document.getElementById('newDishCat');
+        const priceEl = document.getElementById('newDishPrice');
+        const name = nameEl.value.trim();
+        const price = parseFloat(priceEl.value);
+        if (!name || isNaN(price) || price <= 0) return;
+        menuItems.unshift({ id: Date.now(), name, cat: catEl.value, price, active: true });
+        nameEl.value = '';
+        priceEl.value = '';
+        renderMenuTable();
+        showToast('Added "' + name + '" to live QR menu!');
+      });
+
+      /* ----- QR CODE GENERATOR ----- */
+      const qrTableInput = document.getElementById('qrTableInput');
+      const qrMenuMode = document.getElementById('qrMenuMode');
+      const adminQrSvg = document.getElementById('adminQrSvg');
+      const qrTableBadge = document.getElementById('qrTableBadge');
+      const qrMenuLabel = document.getElementById('qrMenuLabel');
+      const qrUrlPreview = document.getElementById('qrUrlPreview');
+
+      function drawTableQr(seedStr) {
+        let seed = 13;
+        for (let i = 0; i < seedStr.length; i++) seed += seedStr.charCodeAt(i) * (i + 1);
+        const size = 29;
+        let rects = '';
+        function isFinder(r, c) {
+          const tl = r < 7 && c < 7;
+          const tr = r < 7 && c >= size - 7;
+          const bl = r >= size - 7 && c < 7;
+          return tl || tr || bl;
+        }
+        for (let r = 0; r < size; r += 2) {
+          for (let c = 0; c < size; c += 2) {
+            if (!isFinder(r, c) && (((r * 19 + c * 29 + seed * 5) % 11) < 5)) {
+              rects += '<rect x="' + c + '" y="' + r + '" width="1.8" height="1.8" rx="0.35" fill="#1e1e2f"/>';
+            }
+          }
+        }
+        const finders = [[0, 0], [size - 7, 0], [0, size - 7]];
+        let frames = '';
+        finders.forEach(([x, y]) => {
+          frames += '<rect x="' + x + '" y="' + y + '" width="7" height="7" rx="1.2" fill="#ffffff" stroke="#1e1e2f" stroke-width="1.3"/>';
+          frames += '<rect x="' + (x + 2) + '" y="' + (y + 2) + '" width="3" height="3" rx="0.6" fill="#f97316"/>';
+        });
+        adminQrSvg.innerHTML = rects + frames;
+      }
+
+      function syncQrPreview() {
+        const raw = qrTableInput.value.trim() || 'Table 07';
+        const slug = raw.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') || 'table-07';
+        qrTableBadge.textContent = raw.toUpperCase();
+        qrMenuLabel.textContent = qrMenuMode.value;
+        qrUrlPreview.textContent = 'https://scandine.io/sol/' + slug;
+        drawTableQr(slug + qrMenuMode.value);
+      }
+
+      qrTableInput.addEventListener('input', syncQrPreview);
+      qrMenuMode.addEventListener('change', syncQrPreview);
+
+      document.getElementById('copyQrLinkBtn').addEventListener('click', () => {
+        const url = qrUrlPreview.textContent;
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(url).catch(() => {});
+        }
+        showToast('Copied ' + url);
+      });
+
+      document.getElementById('printQrBtn').addEventListener('click', () => {
+        showToast('Print proof queued for ' + (qrTableInput.value.trim() || 'Table 07') + '.');
+      });
+
+      /* ----- PRINTER TEST BUTTONS ----- */
+      document.querySelectorAll('.test-print-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          showToast('Test slip sent to ' + btn.dataset.printer + '!');
+        });
+      });
+
+      renderOrders();
+      renderMenuTable();
+      syncQrPreview();
+    })();
+  </script>
+</body>
+</html>

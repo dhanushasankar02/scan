@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ScanDine | Pricing Plans</title>
+  <link rel="icon" type="image/svg+xml" href="images/favicon.svg">
+  <link rel="icon" type="image/png" href="images/favicon.png">
+  <link rel="shortcut icon" href="favicon.ico">
+  <link rel="apple-touch-icon" href="images/favicon.png">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  
+  <style>
+    /* ----- GLOBAL RESET & VARIABLES (Identical) ----- */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --navbar-bg: #ffffff; --footer-bg: #f8fafc; --navbar-shadow: 0 4px 20px rgba(0,0,0,0.05);
+      --text-primary: #1e1e2f; --text-secondary: #4a4a6a; --accent: #f97316; --accent-hover: #ea580c;
+      --dropdown-bg: #ffffff; --dropdown-shadow: 0 10px 25px -5px rgba(0,0,0,0.1); --border-light: #e9e9f0;
+      --icon-color: #4a4a6a; --transition: all 0.2s ease; --surface-color: #ffffff; --surface-alt: #f1f5f9;
+    }
+    html[data-theme="dark"] {
+      --navbar-bg: #12121c; --footer-bg: #0f0f16; --navbar-shadow: 0 4px 20px rgba(0,0,0,0.4);
+      --text-primary: #f0f0f5; --text-secondary: #b0b0c0; --accent: #fb923c; --accent-hover: #f97316;
+      --dropdown-bg: #1e1e2c; --dropdown-shadow: 0 10px 25px -5px rgba(0,0,0,0.6); --border-light: #2a2a3a;
+      --icon-color: #c0c0d0; --surface-color: #1e1e2c; --surface-alt: #12121c;
+    }
+    body {
+      font-family: system-ui, -apple-system, sans-serif; background-color: #f8fafc; color: var(--text-primary);
+      transition: background-color 0.3s, color 0.3s; display: flex; flex-direction: column; min-height: 100vh; overflow-x: hidden;
+    }
+    html[data-theme="dark"] body { background-color: #0b0b12; }
+    main { flex: 1; }
+
+    /* ----- NAVBAR CSS (Identical) ----- */
+    .navbar { background: var(--navbar-bg); box-shadow: var(--navbar-shadow); padding: 0.75rem 2rem; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 1000; transition: background 0.2s, box-shadow 0.2s; flex-wrap: wrap; }
+    .navbar__brand { font-size: 1.6rem; font-weight: 800; letter-spacing: -0.02em; color: var(--text-primary); text-decoration: none; display: flex; align-items: center; }
+    .navbar__brand span { color: var(--accent); }
+    .navbar__menu { display: flex; align-items: center; list-style: none; gap: 1.75rem; margin: 0; padding: 0; }
+    .navbar__item { position: relative; display: flex; align-items: center; height: 100%; }
+    .navbar__link { text-decoration: none; color: var(--text-primary); font-weight: 500; font-size: 0.95rem; display: flex; align-items: center; gap: 0.3rem; padding: 0.5rem 0; transition: var(--transition); border-bottom: 2px solid transparent; }
+    .navbar__link:hover, .navbar__link.is-active { color: var(--accent); border-bottom-color: var(--accent); }
+    .navbar__link i { font-size: 0.7rem; color: var(--text-secondary); transition: transform 0.2s; }
+    .navbar__link.is-active i { color: var(--accent); }
+    .navbar__item:hover .navbar__link i { transform: rotate(180deg); }
+    .navbar__link--login { background-color: var(--accent); color: #ffffff !important; padding: 0.5rem 1.25rem !important; border-radius: 0.5rem; border-bottom: none !important; font-weight: 600; transition: var(--transition); }
+    .navbar__link--login:hover { background-color: var(--accent-hover); color: #ffffff !important; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3); }
+    .dropdown { position: absolute; top: 100%; left: 0; min-width: 200px; background: var(--dropdown-bg); border-radius: 0.75rem; box-shadow: var(--dropdown-shadow); padding: 0.5rem 0; opacity: 0; visibility: hidden; transform: translateY(8px); transition: all 0.2s ease; border: 1px solid var(--border-light); z-index: 100; list-style: none; }
+    .navbar__item:hover .dropdown { opacity: 1; visibility: visible; transform: translateY(0); }
+    .dropdown li a { display: block; padding: 0.5rem 1.25rem; text-decoration: none; color: var(--text-primary); font-size: 0.9rem; transition: background 0.15s; }
+    .dropdown li a:hover { background: var(--border-light); color: var(--accent); }
+    .navbar__icons { display: flex; align-items: center; gap: 1rem; }
+    .icon-btn { background: transparent; border: none; font-size: 1.15rem; color: var(--icon-color); cursor: pointer; padding: 0.4rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: var(--transition); width: 2.2rem; height: 2.2rem; }
+    .icon-btn:hover { background: var(--border-light); color: var(--accent); }
+    .hamburger { display: none; background: transparent; border: none; font-size: 1.5rem; color: var(--text-primary); cursor: pointer; padding: 0.4rem; border-radius: 0.5rem; transition: var(--transition); }
+    .hamburger:hover { background: var(--border-light); }
+    .mobile-menu { display: none; width: 100%; background: var(--navbar-bg); padding: 1rem 0; border-top: 1px solid var(--border-light); transition: all 0.25s ease; }
+    .mobile-menu.active { display: block; }
+    .mobile-menu__list { list-style: none; display: flex; flex-direction: column; gap: 0.2rem; padding: 0 1rem; }
+    .mobile-menu__link { display: flex; align-items: center; justify-content: space-between; padding: 0.75rem 1rem; text-decoration: none; color: var(--text-primary); font-weight: 500; border-radius: 0.5rem; transition: background 0.15s; }
+    .mobile-menu__link:hover, .mobile-menu__link.is-active { background: var(--border-light); color: var(--accent); }
+    .mobile-menu__link i { font-size: 0.75rem; transition: transform 0.2s; }
+    .mobile-menu__link--login { background-color: var(--accent); color: #ffffff !important; justify-content: center; margin: 0.5rem 1rem; padding: 0.8rem; font-weight: 600; }
+    .mobile-menu__link--login:hover { background-color: var(--accent-hover); color: #ffffff !important; }
+    .mobile-submenu { list-style: none; padding-left: 1.5rem; max-height: 0; overflow: hidden; transition: max-height 0.25s ease; }
+    .mobile-submenu.open { max-height: 300px; }
+    .mobile-submenu li a { display: block; padding: 0.5rem 1rem; text-decoration: none; color: var(--text-secondary); font-size: 0.9rem; border-radius: 0.4rem; }
+    .mobile-submenu li a:hover { background: var(--border-light); color: var(--accent); }
+    .mobile-preferences { display: flex; align-items: center; justify-content: flex-start; gap: 1.5rem; padding: 1rem 2rem; margin-top: 0.5rem; border-top: 1px solid var(--border-light); }
+    .mobile-pref-item { display: flex; align-items: center; gap: 0.5rem; color: var(--text-secondary); font-size: 0.9rem; font-weight: 500; cursor: pointer; }
+    .mobile-pref-item .icon-btn { width: 2rem; height: 2rem; font-size: 1.1rem; }
+    html[dir="rtl"] .dropdown { left: auto; right: 0; }
+    html[dir="rtl"] .mobile-submenu { padding-left: 0; padding-right: 1.5rem; }
+    html[dir="rtl"] .mobile-preferences { flex-direction: row-reverse; justify-content: flex-end; }
+    @media (max-width: 992px) {
+      .navbar { padding: 0.75rem 1.25rem; } .navbar__menu { display: none; } .navbar__icons .desktop-only { display: none; } .hamburger { display: flex; }
+      .mobile-menu { display: flex; flex-direction: column; position: fixed; top: 0; right: 0; left: auto; width: min(320px, 85vw); height: 100vh; height: 100dvh; padding: 1.25rem 0 2rem; border-top: none; border-left: 1px solid var(--border-light); box-shadow: -12px 0 36px rgba(0, 0, 0, 0.25); z-index: 1200; overflow-y: auto; transform: translateX(100%); visibility: hidden; transition: transform 0.28s ease, visibility 0.28s ease; }
+      .mobile-menu.active { display: flex; transform: translateX(0); visibility: visible; }
+      .mobile-drawer-header { display: flex; align-items: center; justify-content: space-between; padding: 0 1.25rem 1rem; margin-bottom: 0.75rem; border-bottom: 1px solid var(--border-light); }
+      .mobile-drawer-close { background: transparent; border: none; font-size: 1.35rem; color: var(--text-primary); cursor: pointer; padding: 0.35rem 0.55rem; border-radius: 0.5rem; transition: var(--transition); }
+      .mobile-drawer-close:hover { background: var(--border-light); color: var(--accent); }
+      .mobile-backdrop { display: none; position: fixed; inset: 0; background: rgba(10, 10, 18, 0.55); backdrop-filter: blur(2px); z-index: 1150; }
+      .mobile-backdrop.active { display: block; }
+    }
+
+    /* ----- FOOTER CSS (Identical) ----- */
+    .footer { background-color: var(--footer-bg); border-top: 1px solid var(--border-light); padding: 4rem 2rem 2rem; color: var(--text-secondary); transition: background-color 0.2s, border-color 0.2s; }
+    .footer__container { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 2fr 1fr 1fr 1.5fr; gap: 3rem; }
+    .footer__col h3 { color: var(--text-primary); font-size: 1.1rem; font-weight: 600; margin-bottom: 1.5rem; }
+    .footer__brand { font-size: 1.6rem; font-weight: 800; color: var(--text-primary); text-decoration: none; display: inline-block; margin-bottom: 1rem; }
+    .footer__brand span { color: var(--accent); }
+    .footer__desc { font-size: 0.95rem; line-height: 1.6; margin-bottom: 1.5rem; max-width: 300px; }
+    .footer__socials { display: flex; gap: 0.75rem; }
+    .footer__socials a { display: flex; align-items: center; justify-content: center; width: 2.2rem; height: 2.2rem; border-radius: 50%; background: var(--navbar-bg); color: var(--text-primary); text-decoration: none; border: 1px solid var(--border-light); transition: var(--transition); }
+    .footer__socials a:hover { background: var(--accent); color: #fff; border-color: var(--accent); transform: translateY(-2px); }
+    .footer__links { list-style: none; display: flex; flex-direction: column; gap: 0.8rem; }
+    .footer__links a { text-decoration: none; color: var(--text-secondary); font-size: 0.95rem; transition: var(--transition); }
+    .footer__links a:hover { color: var(--accent); padding-left: 4px; }
+    html[dir="rtl"] .footer__links a:hover { padding-left: 0; padding-right: 4px; }
+    .footer__newsletter p { font-size: 0.95rem; line-height: 1.6; margin-bottom: 1rem; }
+    .footer__form { display: flex; gap: 0.5rem; }
+    .footer__form input { flex: 1; padding: 0.6rem 1rem; border-radius: 0.5rem; border: 1px solid var(--border-light); background: var(--navbar-bg); color: var(--text-primary); font-size: 0.9rem; outline: none; transition: var(--transition); }
+    .footer__form input:focus { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.2); }
+    .footer__form button { background: var(--accent); color: #fff; border: none; padding: 0.6rem 1rem; border-radius: 0.5rem; cursor: pointer; font-weight: 600; font-size: 0.9rem; transition: var(--transition); display: flex; align-items: center; justify-content: center; }
+    .footer__form button:hover { background: var(--accent-hover); }
+    .footer__bottom { max-width: 1200px; margin: 3rem auto 0; padding-top: 1.5rem; border-top: 1px solid var(--border-light); display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem; }
+    .footer__legal { display: flex; gap: 1.5rem; }
+    .footer__legal a { text-decoration: none; color: var(--text-secondary); transition: var(--transition); }
+    .footer__legal a:hover { color: var(--accent); }
+    @media screen and (max-width: 992px) { .footer__container { grid-template-columns: 1fr 1fr; gap: 2.5rem; } .footer__bottom { flex-direction: column; gap: 1rem; text-align: center; } }
+    @media screen and (max-width: 600px) { .footer__container { grid-template-columns: 1fr; } .footer__form { flex-direction: column; } .footer__legal { flex-wrap: wrap; justify-content: center; } }
+
+    /* =========================================
+       UNIQUE PRICING PAGE SECTIONS
+       ========================================= */
+    /* 0. FULL-SCREEN HERO WITH BACKGROUND IMAGE */
+    .pricing-hero {
+      position: relative;
+      min-height: calc(100vh - 64px);
+      min-height: calc(100svh - 64px);
+      width: 100%;
+      padding: 4rem 2rem;
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+    }
+    .pricing-hero__media { position: absolute; inset: 0; z-index: 0; }
+    .pricing-hero__img { width: 100%; height: 100%; object-fit: cover; object-position: center; display: block; }
+    .pricing-hero__overlay {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      background: linear-gradient(105deg, rgba(12, 12, 20, 0.90) 0%, rgba(12, 12, 20, 0.72) 54%, rgba(12, 12, 20, 0.44) 100%);
+    }
+    html[dir="rtl"] .pricing-hero__overlay {
+      background: linear-gradient(255deg, rgba(12, 12, 20, 0.90) 0%, rgba(12, 12, 20, 0.72) 54%, rgba(12, 12, 20, 0.44) 100%);
+    }
+    .pricing-hero__inner { position: relative; z-index: 2; max-width: 1200px; margin: 0 auto; width: 100%; }
+    .pricing-hero__badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(249, 115, 22, 0.18);
+      border: 1px solid rgba(251, 146, 60, 0.45);
+      color: #fdba74;
+      padding: 0.45rem 1rem;
+      border-radius: 999px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      backdrop-filter: blur(8px);
+      margin-bottom: 1.5rem;
+    }
+    .pricing-hero__inner h1 {
+      font-size: clamp(2.6rem, 5vw, 4.2rem);
+      font-weight: 900;
+      line-height: 1.06;
+      letter-spacing: -0.035em;
+      color: #ffffff;
+      max-width: 680px;
+      margin-bottom: 1.25rem;
+    }
+    .pricing-hero__inner h1 span { color: #fb923c; }
+    .pricing-hero__inner p {
+      font-size: 1.15rem;
+      color: rgba(241, 245, 249, 0.88);
+      line-height: 1.7;
+      max-width: 560px;
+      margin-bottom: 2.25rem;
+    }
+    .pricing-hero__actions { display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; }
+    .pricing-hero__btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      background: var(--accent);
+      color: #ffffff;
+      padding: 0.95rem 1.85rem;
+      border-radius: 0.75rem;
+      text-decoration: none;
+      font-weight: 700;
+      transition: var(--transition);
+    }
+    .pricing-hero__btn-primary:hover { background: var(--accent-hover); transform: translateY(-2px); box-shadow: 0 10px 25px rgba(249, 115, 22, 0.35); }
+    .pricing-hero__btn-ghost {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      background: rgba(255, 255, 255, 0.1);
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      padding: 0.95rem 1.85rem;
+      border-radius: 0.75rem;
+      text-decoration: none;
+      font-weight: 600;
+      backdrop-filter: blur(8px);
+      transition: var(--transition);
+    }
+    .pricing-hero__btn-ghost:hover { background: rgba(255, 255, 255, 0.18); border-color: rgba(255, 255, 255, 0.45); transform: translateY(-2px); }
+
+    .pricing-section { padding: 6rem 2rem; max-width: 1200px; margin: 0 auto; position: relative; }
+    .price-title { font-size: 3rem; font-weight: 800; margin-bottom: 1rem; text-align: center; letter-spacing: -0.03em; }
+    .price-subtitle { font-size: 1.1rem; color: var(--text-secondary); margin-bottom: 4rem; text-align: center; max-width: 600px; margin-inline: auto; }
+
+    /* 1. FLOATING PRICING CARDS */
+    .float-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; align-items: center; }
+    .f-card { background: var(--surface-color); border-radius: 2rem; padding: 3rem 2rem; border: 1px solid var(--border-light); position: relative; transition: transform 0.3s, box-shadow 0.3s; }
+    .f-card:hover { transform: translateY(-10px); box-shadow: 0 20px 40px rgba(0,0,0,0.08); }
+    .f-card.popular { border: 2px solid var(--accent); transform: scale(1.05); box-shadow: 0 20px 40px rgba(249, 115, 22, 0.15); z-index: 2; }
+    .f-card.popular:hover { transform: scale(1.05) translateY(-10px); }
+    .popular-badge { position: absolute; top: -15px; left: 50%; transform: translateX(-50%); background: var(--accent); color: #fff; padding: 0.4rem 1.2rem; border-radius: 2rem; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+    .f-card h3 { font-size: 1.4rem; margin-bottom: 0.5rem; }
+    .f-card .price { font-size: 3.5rem; font-weight: 800; margin-bottom: 1rem; color: var(--text-primary); }
+    .f-card .price span { font-size: 1rem; color: var(--text-secondary); font-weight: 500; }
+    .f-card p { color: var(--text-secondary); margin-bottom: 2rem; font-size: 0.95rem; line-height: 1.5; }
+    .f-btn { display: block; width: 100%; padding: 1rem; text-align: center; border-radius: 0.75rem; font-weight: 600; text-decoration: none; transition: all 0.2s; border: 1px solid var(--border-light); color: var(--text-primary); }
+    .f-btn:hover { background: var(--surface-alt); }
+    .f-card.popular .f-btn { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .f-card.popular .f-btn:hover { background: var(--accent-hover); }
+    .f-list { list-style: none; margin-top: 2rem; display: flex; flex-direction: column; gap: 1rem; }
+    .f-list li { display: flex; align-items: center; gap: 0.75rem; font-size: 0.95rem; color: var(--text-secondary); }
+    .f-list i { color: var(--accent); background: rgba(249, 115, 22, 0.1); padding: 0.3rem; border-radius: 50%; font-size: 0.7rem; }
+
+    /* 2. FEATURE MATRIX TABLE */
+    .matrix-section { background: var(--surface-alt); border-radius: 3rem; padding: 5rem 3rem; margin-top: 4rem; border: 1px solid var(--border-light); }
+    .matrix-table { width: 100%; border-collapse: collapse; margin-top: 3rem; text-align: left; }
+    .matrix-table th { padding: 1.5rem 1rem; border-bottom: 2px solid var(--border-light); font-size: 1.1rem; font-weight: 700; color: var(--text-primary); }
+    .matrix-table th:first-child { width: 40%; }
+    .matrix-table td { padding: 1.5rem 1rem; border-bottom: 1px solid var(--border-light); color: var(--text-secondary); font-size: 0.95rem; }
+    .matrix-table tr:last-child td { border-bottom: none; }
+    .matrix-table td i.fa-check { color: #22c55e; font-size: 1.2rem; }
+    .matrix-table td i.fa-minus { color: #cbd5e1; font-size: 1.2rem; }
+    html[data-theme="dark"] .matrix-table td i.fa-minus { color: #475569; }
+
+    /* 3. ADD-ON TOGGLE */
+    .addon-section { display: flex; gap: 4rem; align-items: center; margin-top: 4rem; }
+    .addon-img { flex: 1; border-radius: 2rem; overflow: hidden; height: 400px; box-shadow: var(--navbar-shadow); }
+    .addon-img img { width: 100%; height: 100%; object-fit: cover; }
+    .addon-content { flex: 1; }
+    .addon-content h2 { font-size: 2.5rem; margin-bottom: 1rem; }
+    .addon-content > p { font-size: 1.1rem; color: var(--text-secondary); margin-bottom: 2rem; line-height: 1.6; }
+    .addon-box { background: var(--surface-color); padding: 2rem; border-radius: 1.5rem; border: 1px solid var(--border-light); display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; cursor: pointer; transition: border-color 0.2s; }
+    .addon-box.active { border-color: var(--accent); }
+    .addon-box h4 { font-size: 1.1rem; margin-bottom: 0.25rem; }
+    .addon-box p { color: var(--text-secondary); font-size: 0.9rem; }
+    .toggle-switch { width: 50px; height: 28px; background: var(--border-light); border-radius: 20px; position: relative; transition: background 0.3s; flex-shrink: 0; }
+    .toggle-switch::after { content: ''; position: absolute; top: 3px; left: 3px; width: 22px; height: 22px; background: #fff; border-radius: 50%; transition: transform 0.3s; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+    .addon-box.active .toggle-switch { background: var(--accent); }
+    .addon-box.active .toggle-switch::after { transform: translateX(22px); }
+    html[dir="rtl"] .addon-box.active .toggle-switch::after { transform: translateX(-22px); }
+
+    /* 4. ENTERPRISE HORIZONTAL BANNER */
+    .enterprise-banner { background: #12121c; color: #ffffff; border: 1px solid var(--border-light); border-radius: 2rem; padding: 4.5rem 4rem; display: flex; justify-content: space-between; align-items: center; margin-top: 4rem; overflow: hidden; position: relative; box-shadow: var(--navbar-shadow); }
+    .enterprise-banner__img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0; }
+    .enterprise-banner::after { content: ''; position: absolute; inset: 0; background: linear-gradient(105deg, rgba(12, 12, 20, 0.92) 0%, rgba(16, 16, 26, 0.78) 55%, rgba(18, 18, 28, 0.42) 100%); z-index: 1; pointer-events: none; }
+    html[dir="rtl"] .enterprise-banner::after { background: linear-gradient(255deg, rgba(12, 12, 20, 0.92) 0%, rgba(16, 16, 26, 0.78) 55%, rgba(18, 18, 28, 0.42) 100%); }
+    .ent-content { max-width: 600px; position: relative; z-index: 2; }
+    .ent-content h2 { font-size: 2.5rem; margin-bottom: 1rem; color: #ffffff; }
+    .ent-content p { font-size: 1.1rem; color: rgba(241, 245, 249, 0.9); line-height: 1.6; margin-bottom: 2rem; }
+    .ent-btn { display: inline-block; background: var(--accent); color: #fff; padding: 1rem 2rem; border-radius: 0.75rem; text-decoration: none; font-weight: 600; transition: var(--transition); }
+    .ent-btn:hover { background: var(--accent-hover); transform: translateY(-2px); box-shadow: 0 10px 20px rgba(249, 115, 22, 0.35); }
+
+    /* 5. TESTIMONIALS (Aligned 2-Column Cards) */
+    .offset-testimonials { display: grid; grid-template-columns: repeat(2, minmax(0, 420px)); gap: 2rem; justify-content: center; margin-top: 3.5rem; }
+    .off-card { background: var(--surface-color); padding: 2.5rem; border-radius: 1.5rem; border: 1px solid var(--border-light); box-shadow: var(--navbar-shadow); position: relative; display: flex; flex-direction: column; justify-content: space-between; overflow: hidden; }
+    .off-card::before { content: '"'; position: absolute; top: 0.75rem; right: 1.75rem; font-size: 5rem; color: var(--accent); opacity: 0.12; font-family: serif; line-height: 1; pointer-events: none; }
+    html[dir="rtl"] .off-card::before { right: auto; left: 1.75rem; }
+    .off-stars { color: #fbbf24; margin-bottom: 1rem; font-size: 0.95rem; }
+    .off-text { font-size: 1.05rem; line-height: 1.65; color: var(--text-secondary); font-style: italic; margin-bottom: 1.75rem; position: relative; z-index: 1; }
+    .off-author { display: flex; align-items: center; gap: 1rem; }
+    .off-author img { width: 54px; height: 54px; border-radius: 50%; object-fit: cover; object-position: center; border: 2px solid var(--accent); flex-shrink: 0; }
+    .off-author h5 { font-size: 1rem; color: var(--text-primary); margin-bottom: 0.15rem; }
+    .off-author span { font-size: 0.85rem; color: var(--text-secondary); }
+
+    /* 6. FAQ ACCORDION SPLIT-VIEW */
+    .faq-split { display: grid; grid-template-columns: 1fr 1.5fr; gap: 4rem; margin-top: 5rem; }
+    .faq-left h2 { font-size: 3rem; margin-bottom: 1rem; letter-spacing: -0.03em; }
+    .faq-left p { color: var(--text-secondary); font-size: 1.1rem; line-height: 1.6; }
+    .faq-right { display: flex; flex-direction: column; gap: 1rem; }
+    .faq-item { background: var(--surface-color); border: 1px solid var(--border-light); border-radius: 1rem; overflow: hidden; transition: border-color 0.3s; }
+    .faq-item.active { border-color: var(--accent); }
+    .faq-header { padding: 1.5rem; display: flex; justify-content: space-between; align-items: center; cursor: pointer; font-weight: 600; font-size: 1.1rem; }
+    .faq-header i { transition: transform 0.3s; color: var(--text-secondary); }
+    .faq-item.active .faq-header i { transform: rotate(180deg); color: var(--accent); }
+    .faq-body { max-height: 0; overflow: hidden; transition: max-height 0.3s ease; padding: 0 1.5rem; color: var(--text-secondary); line-height: 1.6; }
+    .faq-item.active .faq-body { max-height: 200px; padding-bottom: 1.5rem; }
+
+    /* 7. GUARANTEE CTA */
+    .guarantee-section { text-align: center; padding: 6rem 2rem; background: var(--surface-color); border-top: 1px solid var(--border-light); margin-top: 4rem; }
+    .guarantee-icon { font-size: 4rem; color: var(--accent); margin-bottom: 1.5rem; }
+    .guarantee-section h2 { font-size: 2.5rem; margin-bottom: 1rem; }
+    .guarantee-section p { color: var(--text-secondary); font-size: 1.1rem; max-width: 600px; margin: 0 auto 2rem; }
+    .guarantee-btn { background: var(--text-primary); color: var(--navbar-bg); padding: 1rem 2.5rem; border-radius: 0.75rem; text-decoration: none; font-weight: 600; font-size: 1.1rem; transition: transform 0.2s; display: inline-block; }
+    .guarantee-btn:hover { transform: translateY(-3px); }
+
+    @media (max-width: 992px) {
+      .float-cards { grid-template-columns: 1fr; gap: 3rem; }
+      .f-card.popular { transform: scale(1); }
+      .f-card.popular:hover { transform: translateY(-10px); }
+      .matrix-table { display: block; overflow-x: auto; white-space: nowrap; }
+      .addon-section { flex-direction: column; }
+      .enterprise-banner { flex-direction: column; text-align: center; padding: 3rem 2rem; }
+      .ent-icon { display: none; }
+      .offset-testimonials { grid-template-columns: 1fr; }
+      .faq-split { grid-template-columns: 1fr; gap: 2rem; }
+    }
+  </style>
+</head>
+<body>
+  <!-- NAVBAR (UNTOUCHED) -->
+  <nav class="navbar">
+    <a href="index.html" class="navbar__brand">Scan<span>Dine</span></a>
+    <ul class="navbar__menu">
+      <li class="navbar__item"><a href="#" class="navbar__link">Home <i class="fas fa-chevron-down"></i></a><ul class="dropdown"><li><a href="index.html">Home1</a></li><li><a href="home2.html">Home2</a></li></ul></li>
+      <li class="navbar__item"><a href="features.html" class="navbar__link">Features</a></li>
+      <li class="navbar__item"><a href="pricing plans.html" class="navbar__link is-active" aria-current="page">Pricing Plans</a></li>
+      <li class="navbar__item"><a href="demo request.html" class="navbar__link">Demo Request</a></li>
+      <li class="navbar__item"><a href="contact.html" class="navbar__link">Contact</a></li>
+      <li class="navbar__item"><a href="#" class="navbar__link">Dashboard <i class="fas fa-chevron-down"></i></a><ul class="dropdown"><li><a href="user-dashboard.html">User Dashboard</a></li><li><a href="admin-dashboard.html">Admin Dashboard</a></li></ul></li>
+      <li class="navbar__item"><a href="login.html" class="navbar__link navbar__link--login">Login</a></li>
+    </ul>
+    <div class="navbar__icons">
+      <button class="icon-btn desktop-only" id="themeToggle"><i class="fas fa-moon" id="themeIcon"></i></button>
+      <button class="icon-btn desktop-only" id="rtlToggle"><i class="fas fa-arrow-right-arrow-left"></i></button>
+      <button class="hamburger" id="hamburgerBtn"><i class="fas fa-bars" id="hamburgerIcon"></i></button>
+    </div>
+    <div class="mobile-menu" id="mobileMenu">
+      <ul class="mobile-menu__list">
+        <li class="mobile-menu__item"><a href="#" class="mobile-menu__link" data-submenu="homeSub">Home <i class="fas fa-chevron-down"></i></a><ul class="mobile-submenu" id="homeSub"><li><a href="index.html">Home1</a></li><li><a href="home2.html">Home2</a></li></ul></li>
+        <li class="mobile-menu__item"><a href="features.html" class="mobile-menu__link">Features</a></li>
+        <li class="mobile-menu__item"><a href="pricing plans.html" class="mobile-menu__link is-active" aria-current="page">Pricing Plans</a></li>
+        <li class="mobile-menu__item"><a href="demo request.html" class="mobile-menu__link">Demo Request</a></li>
+        <li class="mobile-menu__item"><a href="contact.html" class="mobile-menu__link">Contact</a></li>
+        <li class="mobile-menu__item"><a href="#" class="mobile-menu__link" data-submenu="dashSub">Dashboard <i class="fas fa-chevron-down"></i></a><ul class="mobile-submenu" id="dashSub"><li><a href="user-dashboard.html">User Dashboard</a></li><li><a href="admin-dashboard.html">Admin Dashboard</a></li></ul></li>
+        <li class="mobile-menu__item"><a href="login.html" class="mobile-menu__link mobile-menu__link--login">Login</a></li>
+      </ul>
+      <div class="mobile-preferences">
+        <div class="mobile-pref-item" id="mobileThemeToggle"><button class="icon-btn"><i class="fas fa-moon" id="mobileThemeIcon"></i></button><span>Dark Mode</span></div>
+        <div class="mobile-pref-item" id="mobileRtlToggle"><button class="icon-btn"><i class="fas fa-arrow-right-arrow-left"></i></button><span>RTL / LTR</span></div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- MAIN CONTENT -->
+  <main>
+    
+    <!-- FULL-SCREEN HERO SECTION -->
+    <section class="pricing-hero" id="pricing-hero">
+      <div class="pricing-hero__media" aria-hidden="true">
+        <img src="images/pricing-hero-bg.jpg" alt="Evening rooftop restaurant and cocktail bar with bartenders and guests" class="pricing-hero__img">
+      </div>
+      <div class="pricing-hero__overlay" aria-hidden="true"></div>
+      <div class="pricing-hero__inner">
+        <span class="pricing-hero__badge">
+          <i class="fas fa-tags"></i> Transparent Plans &bull; 14-Day Free Trial
+        </span>
+        <h1>Simple pricing that <span>scales</span> with every table.</h1>
+        <p>Start with a 14-day free trial—no credit card or hidden fees. Upgrade seamlessly as you add tables, KDS displays, or new locations.</p>
+        <div class="pricing-hero__actions">
+          <a href="#cards-sec" class="pricing-hero__btn-primary">
+            View Plans <i class="fas fa-arrow-down"></i>
+          </a>
+          <a href="#matrix-sec" class="pricing-hero__btn-ghost">
+            Compare Features <i class="fas fa-table"></i>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 1: FLOATING PRICING CARDS -->
+    <section class="pricing-section" id="cards-sec">
+      <h2 class="price-title">Simple, Transparent Pricing</h2>
+      <p class="price-subtitle">Choose the perfect plan for your restaurant. Upgrade or downgrade anytime. No hidden fees.</p>
+      
+      <div class="float-cards">
+        <div class="f-card">
+          <h3>Starter</h3>
+          <div class="price">$29<span>/mo</span></div>
+          <p>Perfect for small cafes and food trucks.</p>
+          <a href="#" class="f-btn">Start Free Trial</a>
+          <ul class="f-list">
+            <li><i class="fas fa-check"></i> Up to 50 menu items</li>
+            <li><i class="fas fa-check"></i> 1 QR code</li>
+            <li><i class="fas fa-check"></i> Basic analytics</li>
+            <li><i class="fas fa-check"></i> Email support</li>
+          </ul>
+        </div>
+
+        <div class="f-card popular">
+          <div class="popular-badge">Most Popular</div>
+          <h3>Pro</h3>
+          <div class="price">$59<span>/mo</span></div>
+          <p>Ideal for busy full-service restaurants.</p>
+          <a href="#" class="f-btn">Start Free Trial</a>
+          <ul class="f-list">
+            <li><i class="fas fa-check"></i> Unlimited menu items</li>
+            <li><i class="fas fa-check"></i> 10 QR codes</li>
+            <li><i class="fas fa-check"></i> Advanced analytics</li>
+            <li><i class="fas fa-check"></i> Smart upselling</li>
+            <li><i class="fas fa-check"></i> Priority support</li>
+          </ul>
+        </div>
+
+        <div class="f-card">
+          <h3>Premium</h3>
+          <div class="price">$99<span>/mo</span></div>
+          <p>For high-volume and multi-location brands.</p>
+          <a href="contact.html" class="f-btn">Contact Sales</a>
+          <ul class="f-list">
+            <li><i class="fas fa-check"></i> Everything in Pro</li>
+            <li><i class="fas fa-check"></i> Unlimited QR codes</li>
+            <li><i class="fas fa-check"></i> Multi-location sync</li>
+            <li><i class="fas fa-check"></i> API access</li>
+            <li><i class="fas fa-check"></i> Dedicated manager</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 2: FEATURE MATRIX TABLE -->
+    <section class="pricing-section" id="matrix-sec" style="padding-top: 0;">
+      <div class="matrix-section">
+        <h2 class="price-title" style="text-align: left; margin-bottom: 1rem;">Compare Features</h2>
+        <p style="color: var(--text-secondary); margin-bottom: 2rem;">Detailed breakdown of what's included in each plan.</p>
+        
+        <table class="matrix-table">
+          <thead>
+            <tr>
+              <th>Feature</th>
+              <th>Starter</th>
+              <th>Pro</th>
+              <th>Premium</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Digital Menu Builder</td><td><i class="fas fa-check"></i></td><td><i class="fas fa-check"></i></td><td><i class="fas fa-check"></i></td></tr>
+            <tr><td>Contactless Ordering</td><td><i class="fas fa-minus"></i></td><td><i class="fas fa-check"></i></td><td><i class="fas fa-check"></i></td></tr>
+            <tr><td>Multi-Language Support</td><td><i class="fas fa-minus"></i></td><td><i class="fas fa-check"></i></td><td><i class="fas fa-check"></i></td></tr>
+            <tr><td>Allergen Filtering</td><td><i class="fas fa-check"></i></td><td><i class="fas fa-check"></i></td><td><i class="fas fa-check"></i></td></tr>
+            <tr><td>Kitchen Display System (KDS)</td><td><i class="fas fa-minus"></i></td><td><i class="fas fa-minus"></i></td><td><i class="fas fa-check"></i></td></tr>
+            <tr><td>Dedicated Account Manager</td><td><i class="fas fa-minus"></i></td><td><i class="fas fa-minus"></i></td><td><i class="fas fa-check"></i></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- SECTION 3: ADD-ON TOGGLE -->
+    <section class="pricing-section" id="addon-sec">
+      <div class="addon-section">
+        <div class="addon-img">
+          <img src="images/pricing-addon.jpg" alt="Restaurant tablet POS stand, receipt printer, and tabletop menu hardware">
+        </div>
+        <div class="addon-content">
+          <h2>Customize Your Setup</h2>
+          <p>Enhance your ScanDine experience with premium hardware and services. Toggle to add them to your plan.</p>
+          
+          <div class="addon-box" onclick="this.classList.toggle('active')">
+            <div>
+              <h4>QR Table Stands (Pack of 10)</h4>
+              <p>Premium acrylic stands with your logo. +$49 one-time</p>
+            </div>
+            <div class="toggle-switch"></div>
+          </div>
+          
+          <div class="addon-box active" onclick="this.classList.toggle('active')">
+            <div>
+              <h4>Kitchen Display Tablet</h4>
+              <p>10-inch rugged tablet pre-configured for KDS. +$15/mo</p>
+            </div>
+            <div class="toggle-switch"></div>
+          </div>
+          
+          <div class="addon-box" onclick="this.classList.toggle('active')">
+            <div>
+              <h4>Professional Photography</h4>
+              <p>We shoot your menu items for maximum appeal. +$199 one-time</p>
+            </div>
+            <div class="toggle-switch"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 4: ENTERPRISE HORIZONTAL BANNER -->
+    <section class="pricing-section" id="enterprise-sec">
+      <div class="enterprise-banner">
+        <img src="images/pricing-enterprise.jpg" alt="Upscale multi-table hotel restaurant dining room for enterprise hospitality chains" class="enterprise-banner__img">
+        <div class="ent-content">
+          <h2>Need a custom enterprise solution?</h2>
+          <p>For large chains with unique POS integrations, franchise management, or custom SLA requirements. Let's talk.</p>
+          <a href="contact.html" class="ent-btn">Contact Enterprise Sales</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 5: TESTIMONIAL CAROUSEL/OFFSET -->
+    <section class="pricing-section" id="testi-sec">
+      <h2 class="price-title">Trusted by Industry Leaders</h2>
+      <p class="price-subtitle">Don't just take our word for it. See why 500+ restaurants chose ScanDine.</p>
+      
+      <div class="offset-testimonials">
+        <div class="off-card">
+          <div class="off-stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
+          <p class="off-text">"The Pro plan paid for itself on the first weekend. The smart upselling feature alone increased our dessert sales by 30%."</p>
+          <div class="off-author">
+            <img src="images/pricing-avatar-elena.jpg" alt="Elena Rodriguez, Owner, Tapas & Vino">
+            <div><h5>Elena Rodriguez</h5><span>Owner, Tapas & Vino</span></div>
+          </div>
+        </div>
+        
+        <div class="off-card">
+          <div class="off-stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
+          <p class="off-text">"We manage 12 locations. The Premium plan's multi-location sync and KDS integration have completely streamlined our operations."</p>
+          <div class="off-author">
+            <img src="images/pricing-avatar-david.jpg" alt="David Park, Operations Director, Urban Eats">
+            <div><h5>David Park</h5><span>Operations Director, Urban Eats</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 6: FAQ ACCORDION SPLIT-VIEW -->
+    <section class="pricing-section" id="faq-sec">
+      <div class="faq-split">
+        <div class="faq-left">
+          <h2>Frequently Asked Questions</h2>
+          <p>Everything you need to know about our pricing, plans, and billing. Can't find the answer you're looking for? Contact our support team.</p>
+        </div>
+        <div class="faq-right">
+          <div class="faq-item active" onclick="toggleFaq(this)">
+            <div class="faq-header">Can I change my plan later? <i class="fas fa-chevron-down"></i></div>
+            <div class="faq-body">Absolutely. You can upgrade or downgrade your plan at any time from your admin dashboard. If you upgrade, the changes take effect immediately. If you downgrade, the changes take effect at the start of your next billing cycle.</div>
+          </div>
+          <div class="faq-item" onclick="toggleFaq(this)">
+            <div class="faq-header">Is there a setup fee? <i class="fas fa-chevron-down"></i></div>
+            <div class="faq-body">No. We believe in transparent pricing. There are no setup fees, hidden charges, or long-term contracts. You only pay the monthly subscription.</div>
+          </div>
+          <div class="faq-item" onclick="toggleFaq(this)">
+            <div class="faq-header">Do you offer a free trial? <i class="fas fa-chevron-down"></i></div>
+            <div class="faq-body">Yes! All plans come with a 14-day free trial. You do not need to enter a credit card to start your trial.</div>
+          </div>
+          <div class="faq-item" onclick="toggleFaq(this)">
+            <div class="faq-header">What payment methods do you accept? <i class="fas fa-chevron-down"></i></div>
+            <div class="faq-body">We accept all major credit cards (Visa, Mastercard, Amex) as well as Apple Pay and Google Pay.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 7: GUARANTEE CTA -->
+    <section class="guarantee-section" id="guarantee-sec">
+      <i class="fas fa-shield-alt guarantee-icon"></i>
+      <h2>30-Day Money-Back Guarantee</h2>
+      <p>If ScanDine doesn't save you time and increase your revenue within 30 days, we'll refund your subscription. No questions asked.</p>
+      <a href="#" class="guarantee-btn">Get Started Risk-Free</a>
+    </section>
+
+  </main>
+
+  <!-- FOOTER (UNTOUCHED) -->
+  <footer class="footer">
+    <div class="footer__container">
+      <div class="footer__col">
+        <a href="#" class="footer__brand">Scan<span>Dine</span></a>
+        <p class="footer__desc">The ultimate QR code menu and contactless ordering system for modern restaurants.</p>
+        <div class="footer__socials"><a href="#"><i class="fab fa-twitter"></i></a><a href="#"><i class="fab fa-facebook-f"></i></a><a href="#"><i class="fab fa-instagram"></i></a></div>
+      </div>
+      <div class="footer__col"><h3>Product</h3><ul class="footer__links"><li><a href="features.html">Features</a></li><li><a href="pricing.html">Pricing Plans</a></li><li><a href="demo.html">Demo Request</a></li></ul></div>
+      <div class="footer__col"><h3>Support</h3><ul class="footer__links"><li><a href="#">Help Center</a></li><li><a href="contact.html">Contact Us</a></li><li><a href="#">Privacy Policy</a></li></ul></div>
+      <div class="footer__col footer__newsletter">
+        <h3>Stay Updated</h3><p>Subscribe to our newsletter.</p>
+        <form class="footer__form" onsubmit="event.preventDefault();"><input type="email" placeholder="Email address" required><button type="submit"><i class="fas fa-paper-plane"></i></button></form>
+      </div>
+    </div>
+    <div class="footer__bottom">
+      <p>&copy; 2023 ScanDine. All rights reserved.</p>
+      <div class="footer__legal"><a href="#">Privacy</a><a href="#">Terms</a><a href="#">Cookies</a></div>
+    </div>
+  </footer>
+
+  <!-- FRAMER MOTION SCRIPT -->
+  <script type="module">
+    import { animate, inView, stagger } from "https://cdn.jsdelivr.net/npm/framer-motion@11.0.8/dom/+esm";
+
+    // 0. HERO SECTION
+    inView("#pricing-hero", (info) => {
+      if (info.target) {
+        animate(".pricing-hero__badge", { opacity: [0, 1], y: [20, 0] }, { duration: 0.6, ease: "easeOut" });
+        animate(".pricing-hero__inner h1", { opacity: [0, 1], y: [28, 0] }, { duration: 0.75, delay: 0.1, ease: "easeOut" });
+        animate(".pricing-hero__inner p", { opacity: [0, 1], y: [20, 0] }, { duration: 0.75, delay: 0.2, ease: "easeOut" });
+        animate(".pricing-hero__actions", { opacity: [0, 1], y: [20, 0] }, { duration: 0.7, delay: 0.3, ease: "easeOut" });
+      }
+    });
+
+    // 1. FLOATING PRICING CARDS: Unique Animation -> Float Up & Scale
+    inView("#cards-sec", (info) => {
+      if (info.target) {
+        animate(".f-card", 
+          { opacity: [0, 1], y: [60, 0], scale: [0.95, 1] }, 
+          { duration: 0.8, delay: stagger(0.2), ease: "easeOut" }
+        );
+      }
+    });
+
+    // 2. FEATURE MATRIX: Unique Animation -> Row-by-Row Reveal
+    inView("#matrix-sec", (info) => {
+      if (info.target) {
+        animate(".matrix-table tbody tr", 
+          { opacity: [0, 1], x: [-20, 0] }, 
+          { duration: 0.4, delay: stagger(0.1), ease: "easeOut" }
+        );
+      }
+    });
+
+    // 3. ADD-ON TOGGLE: Unique Animation -> Staggered Slide from Right
+    inView("#addon-sec", (info) => {
+      if (info.target) {
+        animate(".addon-img", { opacity: [0, 1], x: [-50, 0] }, { duration: 0.8, ease: "easeOut" });
+        animate(".addon-content > *", 
+          { opacity: [0, 1], x: [30, 0] }, 
+          { duration: 0.6, delay: stagger(0.15), ease: "easeOut" }
+        );
+      }
+    });
+
+    // 4. ENTERPRISE BANNER: Unique Animation -> Slide Left & Fade
+    inView(".enterprise-banner", (info) => {
+      if (info.target) {
+        animate(".ent-content", { opacity: [0, 1], x: [-40, 0] }, { duration: 0.8, ease: "easeOut" });
+        animate(".enterprise-banner__img", { opacity: [0, 1], scale: [1.06, 1] }, { duration: 1, ease: "easeOut" });
+      }
+    });
+
+    // 5. TESTIMONIALS: Unique Animation -> Scale & Fade (Center out)
+    inView(".offset-testimonials", (info) => {
+      if (info.target) {
+        animate(".off-card", 
+          { opacity: [0, 1], scale: [0.9, 1] }, 
+          { duration: 0.8, delay: stagger(0.2), ease: "easeOut" }
+        );
+      }
+    });
+
+    // 6. FAQ SPLIT: Unique Animation -> Staggered Height Expansion
+    inView(".faq-split", (info) => {
+      if (info.target) {
+        animate(".faq-left", { opacity: [0, 1], x: [-30, 0] }, { duration: 0.8, ease: "easeOut" });
+        animate(".faq-item", 
+          { opacity: [0, 1], y: [20, 0] }, 
+          { duration: 0.5, delay: stagger(0.15), ease: "easeOut" }
+        );
+      }
+    });
+
+    // 7. GUARANTEE CTA: Unique Animation -> Elastic Scale Pop
+    inView(".guarantee-section", (info) => {
+      if (info.target) {
+        animate(".guarantee-icon", { scale: [0, 1.2, 1], opacity: [0, 1] }, { duration: 0.8, ease: "easeInOut" });
+        animate(".guarantee-section h2", { opacity: [0, 1], y: [20, 0] }, { duration: 0.6, delay: 0.3 });
+        animate(".guarantee-btn", { scale: [0.9, 1], opacity: [0, 1] }, { duration: 0.5, delay: 0.5, ease: "backOut" });
+      }
+    });
+
+    // FAQ INTERACTIVITY
+    window.toggleFaq = function(element) {
+      const isActive = element.classList.contains('active');
+      document.querySelectorAll('.faq-item').forEach(item => item.classList.remove('active'));
+      if (!isActive) element.classList.add('active');
+    };
+  </script>
+
+  <!-- NAVBAR/FOOTER LOGIC (Identical) -->
+  <script>
+    (function() {
+      const htmlElement = document.documentElement;
+      const desktopThemeToggle = document.getElementById('themeToggle');
+      const desktopRtlToggle = document.getElementById('rtlToggle');
+      const mobileThemeToggle = document.getElementById('mobileThemeToggle');
+      const mobileRtlToggle = document.getElementById('mobileRtlToggle');
+      const themeIcons = [document.getElementById('themeIcon'), document.getElementById('mobileThemeIcon')];
+      const hamburgerBtn = document.getElementById('hamburgerBtn');
+      const hamburgerIcon = document.getElementById('hamburgerIcon');
+      const mobileMenu = document.getElementById('mobileMenu');
+
+      function updateTheme(isDark) {
+        if (isDark) {
+          htmlElement.setAttribute('data-theme', 'dark');
+          themeIcons.forEach(icon => { icon.classList.remove('fa-moon'); icon.classList.add('fa-sun'); });
+          localStorage.setItem('theme', 'dark');
+        } else {
+          htmlElement.removeAttribute('data-theme');
+          themeIcons.forEach(icon => { icon.classList.remove('fa-sun'); icon.classList.add('fa-moon'); });
+          localStorage.setItem('theme', 'light');
+        }
+      }
+      if (localStorage.getItem('theme') === 'dark') updateTheme(true);
+      desktopThemeToggle.addEventListener('click', () => updateTheme(htmlElement.getAttribute('data-theme') !== 'dark'));
+      mobileThemeToggle.addEventListener('click', () => updateTheme(htmlElement.getAttribute('data-theme') !== 'dark'));
+
+      function updateDirection(isRtl) {
+        if (isRtl) { htmlElement.setAttribute('dir', 'rtl'); localStorage.setItem('dir', 'rtl'); }
+        else { htmlElement.setAttribute('dir', 'ltr'); localStorage.setItem('dir', 'ltr'); }
+      }
+      if (localStorage.getItem('dir') === 'rtl') updateDirection(true);
+      desktopRtlToggle.addEventListener('click', () => updateDirection(htmlElement.getAttribute('dir') !== 'rtl'));
+      mobileRtlToggle.addEventListener('click', () => updateDirection(htmlElement.getAttribute('dir') !== 'rtl'));
+
+      const mobileBackdrop = document.createElement('div');
+      mobileBackdrop.className = 'mobile-backdrop';
+      document.body.appendChild(mobileBackdrop);
+      document.body.appendChild(mobileMenu);
+      if (!mobileMenu.querySelector('.mobile-drawer-header')) {
+        const drawerHeader = document.createElement('div');
+        drawerHeader.className = 'mobile-drawer-header';
+        drawerHeader.innerHTML = '<a href="index.html" class="navbar__brand">Scan<span>Dine</span></a><button type="button" class="mobile-drawer-close" aria-label="Close menu"><i class="fas fa-times"></i></button>';
+        mobileMenu.prepend(drawerHeader);
+      }
+      const drawerCloseBtn = mobileMenu.querySelector('.mobile-drawer-close');
+
+      function setMobileMenu(open) {
+        if (open) {
+          mobileMenu.classList.add('active'); mobileBackdrop.classList.add('active'); hamburgerIcon.classList.replace('fa-bars', 'fa-times'); document.body.style.overflow = 'hidden';
+        } else {
+          mobileMenu.classList.remove('active'); mobileBackdrop.classList.remove('active'); hamburgerIcon.classList.replace('fa-times', 'fa-bars'); document.body.style.overflow = '';
+        }
+      }
+
+      hamburgerBtn.addEventListener('click', () => setMobileMenu(!mobileMenu.classList.contains('active')));
+      if (drawerCloseBtn) drawerCloseBtn.addEventListener('click', () => setMobileMenu(false));
+      mobileBackdrop.addEventListener('click', () => setMobileMenu(false));
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && mobileMenu.classList.contains('active')) setMobileMenu(false); });
+
+      const mobileSubLinks = document.querySelectorAll('.mobile-menu__link[data-submenu]');
+      mobileSubLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
+          e.preventDefault();
+          const targetId = link.getAttribute('data-submenu');
+          const submenu = document.getElementById(targetId);
+          document.querySelectorAll('.mobile-submenu').forEach(sm => { if (sm.id !== targetId) sm.classList.remove('open'); });
+          submenu.classList.toggle('open');
+          const chevron = link.querySelector('i');
+          if (chevron) chevron.style.transform = submenu.classList.contains('open') ? 'rotate(180deg)' : 'rotate(0deg)';
+        });
+      });
+
+      window.addEventListener('resize', () => {
+        if (window.innerWidth > 992 && mobileMenu.classList.contains('active')) {
+          setMobileMenu(false);
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

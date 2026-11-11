@@ -1,0 +1,1438 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ScanDine | User Dashboard</title>
+  <link rel="icon" type="image/svg+xml" href="images/favicon.svg">
+  <link rel="icon" type="image/png" href="images/favicon.png">
+  <link rel="shortcut icon" href="favicon.ico">
+  <link rel="apple-touch-icon" href="images/favicon.png">
+  <!-- Font Awesome 6 (free) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+  <style>
+    /* ----- GLOBAL RESET & SCANDINE THEME TOKENS ----- */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg-app: #f4f6fa;
+      --surface-color: #ffffff;
+      --surface-alt: #f1f5f9;
+      --sidebar-bg: #ffffff;
+      --text-primary: #1e1e2f;
+      --text-secondary: #525270;
+      --accent: #f97316;
+      --accent-hover: #ea580c;
+      --accent-soft: rgba(249, 115, 22, 0.12);
+      --border-light: #e5e7ef;
+      --success: #10b981;
+      --success-soft: rgba(16, 185, 129, 0.14);
+      --warning: #f59e0b;
+      --warning-soft: rgba(245, 158, 11, 0.14);
+      --shadow-sm: 0 4px 20px rgba(15, 23, 42, 0.05);
+      --shadow-md: 0 14px 34px -14px rgba(15, 23, 42, 0.12);
+      --transition: all 0.2s ease;
+    }
+
+    html[data-theme="dark"] {
+      --bg-app: #0b0b12;
+      --surface-color: #161623;
+      --surface-alt: #10101a;
+      --sidebar-bg: #12121d;
+      --text-primary: #f0f0f5;
+      --text-secondary: #a4a4bc;
+      --accent: #fb923c;
+      --accent-hover: #f97316;
+      --accent-soft: rgba(251, 146, 60, 0.16);
+      --border-light: #262638;
+      --shadow-sm: 0 4px 20px rgba(0, 0, 0, 0.35);
+      --shadow-md: 0 18px 40px -16px rgba(0, 0, 0, 0.55);
+    }
+
+    body {
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+      background-color: var(--bg-app);
+      color: var(--text-primary);
+      transition: background-color 0.25s, color 0.25s;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    .mono {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
+
+    /* =========================================
+       APP SHELL LAYOUT (NO NAVBAR / NO FOOTER)
+       ========================================= */
+    .app-shell {
+      display: grid;
+      grid-template-columns: 268px 1fr;
+      min-height: 100vh;
+    }
+
+    /* SIDEBAR */
+    .sidebar {
+      background: var(--sidebar-bg);
+      border-right: 1px solid var(--border-light);
+      padding: 1.5rem 1.15rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      z-index: 200;
+      transition: transform 0.25s ease, background-color 0.25s;
+    }
+
+    html[dir="rtl"] .sidebar {
+      border-right: none;
+      border-left: 1px solid var(--border-light);
+    }
+
+    .sidebar__top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 0.35rem;
+    }
+
+    .brand {
+      font-size: 1.55rem;
+      font-weight: 800;
+      letter-spacing: -0.025em;
+      color: var(--text-primary);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      line-height: 1;
+    }
+
+    .brand span { color: var(--accent); }
+
+    .brand-tag {
+      font-size: 0.68rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      background: var(--accent-soft);
+      color: var(--accent);
+      padding: 0.22rem 0.55rem;
+      border-radius: 999px;
+    }
+
+    .sidebar-close {
+      display: none;
+      background: transparent;
+      border: none;
+      color: var(--text-secondary);
+      font-size: 1.25rem;
+      cursor: pointer;
+    }
+
+    .side-nav {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+      flex: 1;
+    }
+
+    .side-link {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.78rem 1rem;
+      border-radius: 0.85rem;
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--text-secondary);
+      font-family: inherit;
+      font-size: 0.92rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: left;
+      transition: var(--transition);
+    }
+
+    html[dir="rtl"] .side-link { text-align: right; }
+
+    .side-link__left {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      min-width: 0;
+    }
+
+    .side-link i {
+      width: 1.25rem;
+      flex-shrink: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      font-size: 0.98rem;
+    }
+
+    .side-link:hover {
+      background: var(--surface-alt);
+      color: var(--text-primary);
+    }
+
+    .side-link.active {
+      background: var(--accent-soft);
+      border-color: rgba(249, 115, 22, 0.3);
+      color: var(--accent);
+    }
+
+    .side-badge {
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 0.15rem 0.5rem;
+      border-radius: 999px;
+      background: var(--accent);
+      color: #ffffff;
+    }
+
+    .sidebar__footer {
+      border-top: 1px solid var(--border-light);
+      padding-top: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .user-chip {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.4rem 0.25rem;
+    }
+
+    .user-avatar {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: var(--accent);
+      color: #ffffff;
+      font-weight: 800;
+      font-size: 0.88rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .user-chip strong {
+      display: block;
+      font-size: 0.9rem;
+    }
+
+    .user-chip span {
+      display: block;
+      font-size: 0.76rem;
+      color: var(--text-secondary);
+    }
+
+    .sidebar-prefs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.55rem;
+    }
+
+    .sidebar-pref-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.45rem;
+      padding: 0.58rem 0.65rem;
+      border-radius: 0.75rem;
+      border: 1px solid var(--border-light);
+      background: var(--surface-alt);
+      color: var(--text-primary);
+      font-family: inherit;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .sidebar-pref-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .back-home-link {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.65rem 0.9rem;
+      border-radius: 0.75rem;
+      border: 1px solid var(--border-light);
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 0.84rem;
+      font-weight: 600;
+      transition: var(--transition);
+    }
+
+    .back-home-link:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    /* WORKSPACE HEADER + MAIN */
+    .workspace {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    .topbar {
+      padding: 1.1rem 2rem;
+      border-bottom: 1px solid var(--border-light);
+      background: var(--surface-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 0.9rem;
+    }
+
+    .menu-toggle-btn {
+      display: none;
+      background: var(--surface-alt);
+      border: 1px solid var(--border-light);
+      color: var(--text-primary);
+      width: 2.35rem;
+      height: 2.35rem;
+      border-radius: 0.65rem;
+      cursor: pointer;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.05rem;
+    }
+
+    .topbar-title h1 {
+      font-size: 1.25rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .topbar-title p {
+      font-size: 0.82rem;
+      color: var(--text-secondary);
+    }
+
+    .topbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+    }
+
+    .icon-action {
+      width: 2.35rem;
+      height: 2.35rem;
+      border-radius: 0.7rem;
+      border: 1px solid var(--border-light);
+      background: var(--surface-alt);
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .icon-action:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .waiter-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.6rem 1rem;
+      border-radius: 0.75rem;
+      border: none;
+      background: var(--accent);
+      color: #ffffff;
+      font-family: inherit;
+      font-size: 0.86rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .waiter-btn:hover { background: var(--accent-hover); }
+
+    .waiter-btn.called {
+      background: var(--success);
+    }
+
+    /* MAIN CONTENT VIEWS */
+    .dash-content {
+      padding: 1.75rem 2rem 2.5rem;
+      max-width: 1280px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    .dash-view { display: none; }
+    .dash-view.active { display: block; }
+
+    /* STAT KPI STRIP */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1.15rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .kpi-card {
+      background: var(--surface-color);
+      border: 1px solid var(--border-light);
+      border-radius: 1.25rem;
+      padding: 1.2rem 1.3rem;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .kpi-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.75rem;
+      color: var(--text-secondary);
+      font-size: 0.82rem;
+      font-weight: 600;
+    }
+
+    .kpi-icon {
+      width: 2rem;
+      height: 2rem;
+      border-radius: 0.6rem;
+      background: var(--accent-soft);
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+    }
+
+    .kpi-value {
+      font-size: 1.65rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.2rem;
+    }
+
+    .kpi-sub {
+      font-size: 0.78rem;
+      color: var(--text-secondary);
+    }
+
+    /* OVERVIEW 2-COLUMN GRID */
+    .overview-grid {
+      display: grid;
+      grid-template-columns: 1.35fr 0.85fr;
+      gap: 1.35rem;
+      align-items: start;
+    }
+
+    .panel {
+      background: var(--surface-color);
+      border: 1px solid var(--border-light);
+      border-radius: 1.35rem;
+      padding: 1.45rem;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .panel-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1.15rem;
+      flex-wrap: wrap;
+    }
+
+    .panel-head h2 {
+      font-size: 1.08rem;
+      font-weight: 800;
+    }
+
+    .status-pill {
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 0.3rem 0.75rem;
+      border-radius: 999px;
+      background: var(--warning-soft);
+      color: var(--warning);
+    }
+
+    .status-pill.ready {
+      background: var(--success-soft);
+      color: var(--success);
+    }
+
+    /* LIVE ORDER PROGRESS STEPPER */
+    .stepper {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.65rem;
+      margin-bottom: 1.35rem;
+    }
+
+    .step-node {
+      background: var(--surface-alt);
+      border: 1px solid var(--border-light);
+      border-radius: 0.9rem;
+      padding: 0.75rem;
+      text-align: center;
+      font-size: 0.78rem;
+      color: var(--text-secondary);
+    }
+
+    .step-node i {
+      display: block;
+      font-size: 1rem;
+      margin-bottom: 0.35rem;
+    }
+
+    .step-node.done {
+      border-color: var(--success);
+      background: var(--success-soft);
+      color: var(--success);
+      font-weight: 700;
+    }
+
+    .step-node.current {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    .order-item-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.7rem;
+      margin-bottom: 1.15rem;
+    }
+
+    .order-item-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      padding: 0.7rem 0.85rem;
+      border-radius: 0.85rem;
+      background: var(--surface-alt);
+      border: 1px solid var(--border-light);
+      font-size: 0.88rem;
+    }
+
+    .order-item-row strong { display: block; }
+    .order-item-row span { font-size: 0.76rem; color: var(--text-secondary); }
+
+    .order-total-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 0.95rem;
+      border-top: 1px dashed var(--border-light);
+      font-weight: 800;
+      font-size: 1rem;
+    }
+
+    .btn-sm {
+      padding: 0.55rem 0.95rem;
+      border-radius: 0.7rem;
+      border: 1px solid var(--border-light);
+      background: var(--surface-alt);
+      color: var(--text-primary);
+      font-family: inherit;
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .btn-sm:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .btn-sm.primary {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #ffffff;
+    }
+
+    .btn-sm.primary:hover { background: var(--accent-hover); color: #ffffff; }
+
+    /* QUICK REORDER & MENU GRID */
+    .filter-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.85rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .pill-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .filter-pill {
+      padding: 0.48rem 0.95rem;
+      border-radius: 999px;
+      border: 1px solid var(--border-light);
+      background: var(--surface-color);
+      color: var(--text-secondary);
+      font-family: inherit;
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .filter-pill.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #ffffff;
+    }
+
+    .menu-cart-layout {
+      display: grid;
+      grid-template-columns: 1.35fr 0.75fr;
+      gap: 1.35rem;
+      align-items: start;
+    }
+
+    .menu-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+    }
+
+    .dish-card {
+      background: var(--surface-color);
+      border: 1px solid var(--border-light);
+      border-radius: 1.2rem;
+      padding: 1.15rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .dish-card.is-hidden { display: none; }
+
+    .dish-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 0.5rem;
+    }
+
+    .dish-tag {
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 0.2rem 0.55rem;
+      border-radius: 0.45rem;
+      background: var(--success-soft);
+      color: var(--success);
+    }
+
+    .dish-card h3 { font-size: 1rem; font-weight: 800; }
+    .dish-card p { font-size: 0.82rem; color: var(--text-secondary); line-height: 1.45; }
+
+    .dish-foot {
+      margin-top: auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 0.5rem;
+    }
+
+    .dish-price { font-weight: 800; font-size: 1rem; }
+
+    .fav-heart {
+      background: transparent;
+      border: none;
+      color: var(--text-secondary);
+      cursor: pointer;
+      font-size: 1rem;
+    }
+
+    .fav-heart.liked { color: #ef4444; }
+
+    /* TABLE / RECEIPTS */
+    .table-wrap {
+      overflow-x: auto;
+    }
+
+    .orders-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.88rem;
+    }
+
+    .orders-table th,
+    .orders-table td {
+      text-align: left;
+      padding: 0.85rem 0.75rem;
+      border-bottom: 1px solid var(--border-light);
+    }
+
+    html[dir="rtl"] .orders-table th,
+    html[dir="rtl"] .orders-table td {
+      text-align: right;
+    }
+
+    .orders-table th {
+      font-size: 0.76rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-secondary);
+    }
+
+    /* ALLERGEN & REWARDS */
+    .pref-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .pref-card {
+      background: var(--surface-color);
+      border: 1px solid var(--border-light);
+      border-radius: 1.2rem;
+      padding: 1.2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      cursor: pointer;
+    }
+
+    .pref-card input {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--accent);
+      cursor: pointer;
+    }
+
+    .reward-meter {
+      height: 10px;
+      background: var(--surface-alt);
+      border-radius: 999px;
+      overflow: hidden;
+      margin: 0.85rem 0;
+    }
+
+    .reward-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), #10b981);
+      border-radius: 999px;
+      transition: width 0.35s ease;
+    }
+
+    .toast-msg {
+      position: fixed;
+      bottom: 1.5rem;
+      right: 1.5rem;
+      background: var(--text-primary);
+      color: var(--surface-color);
+      padding: 0.8rem 1.2rem;
+      border-radius: 0.85rem;
+      font-size: 0.86rem;
+      font-weight: 700;
+      box-shadow: var(--shadow-md);
+      opacity: 0;
+      transform: translateY(12px);
+      pointer-events: none;
+      transition: all 0.22s ease;
+      z-index: 500;
+    }
+
+    html[dir="rtl"] .toast-msg { right: auto; left: 1.5rem; }
+    .toast-msg.show { opacity: 1; transform: translateY(0); }
+
+    .sidebar-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 150;
+    }
+
+    @media screen and (max-width: 1024px) {
+      .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+      .overview-grid,
+      .menu-cart-layout { grid-template-columns: 1fr; }
+      .pref-grid { grid-template-columns: 1fr; }
+    }
+
+    @media screen and (max-width: 860px) {
+      .app-shell { grid-template-columns: 1fr; }
+      .sidebar {
+        position: fixed;
+        left: 0;
+        top: 0;
+        width: 272px;
+        transform: translateX(-100%);
+      }
+      html[dir="rtl"] .sidebar {
+        left: auto;
+        right: 0;
+        transform: translateX(100%);
+      }
+      .sidebar.open { transform: translateX(0); }
+      .sidebar-backdrop.open { display: block; }
+      .sidebar-close { display: block; }
+      .menu-toggle-btn { display: flex; }
+      .dash-content { padding: 1.25rem; }
+      .topbar { padding: 1rem 1.25rem; }
+    }
+
+    @media screen and (max-width: 600px) {
+      .kpi-grid,
+      .menu-grid,
+      .stepper { grid-template-columns: 1fr; }
+      .waiter-btn span { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+  <div class="app-shell">
+    <!-- APP SIDEBAR -->
+    <aside class="sidebar" id="appSidebar" aria-label="User dashboard navigation">
+      <div class="sidebar__top">
+        <a href="index.html" class="brand">Scan<span>Dine</span></a>
+        <span class="brand-tag">Diner</span>
+        <button type="button" class="sidebar-close" id="sidebarCloseBtn" aria-label="Close sidebar">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <ul class="side-nav" role="tablist">
+        <li>
+          <button type="button" class="side-link active" data-view="overview">
+            <span class="side-link__left"><i class="fas fa-house"></i> Overview</span>
+          </button>
+        </li>
+        <li>
+          <button type="button" class="side-link" data-view="menu">
+            <span class="side-link__left"><i class="fas fa-utensils"></i> Order Menu</span>
+            <span class="side-badge" id="cartBadgeCount">2</span>
+          </button>
+        </li>
+        <li>
+          <button type="button" class="side-link" data-view="orders">
+            <span class="side-link__left"><i class="fas fa-receipt"></i> Orders &amp; Receipts</span>
+          </button>
+        </li>
+        <li>
+          <button type="button" class="side-link" data-view="allergens">
+            <span class="side-link__left"><i class="fas fa-heart"></i> Saved &amp; Allergens</span>
+          </button>
+        </li>
+        <li>
+          <button type="button" class="side-link" data-view="rewards">
+            <span class="side-link__left"><i class="fas fa-award"></i> Rewards</span>
+          </button>
+        </li>
+      </ul>
+
+      <div class="sidebar__footer">
+        <div class="user-chip">
+          <div class="user-avatar">EM</div>
+          <div>
+            <strong>Elena Moretti</strong>
+            <span>Gold Diner &bull; 680 pts</span>
+          </div>
+        </div>
+        <div class="sidebar-prefs">
+          <button type="button" class="sidebar-pref-btn" id="themeToggle" aria-label="Toggle dark mode">
+            <i class="fas fa-moon" id="themeIcon"></i>
+            <span>Theme</span>
+          </button>
+          <button type="button" class="sidebar-pref-btn" id="rtlToggle" aria-label="Toggle RTL/LTR">
+            <i class="fas fa-arrow-right-arrow-left"></i>
+            <span>RTL/LTR</span>
+          </button>
+        </div>
+        <a href="index.html" class="back-home-link">
+          <i class="fas fa-arrow-left"></i> Back to ScanDine Site
+        </a>
+      </div>
+    </aside>
+
+    <!-- MAIN WORKSPACE -->
+    <div class="workspace">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button type="button" class="menu-toggle-btn" id="openSidebarBtn" aria-label="Open sidebar">
+            <i class="fas fa-bars"></i>
+          </button>
+          <div class="topbar-title">
+            <h1 id="viewHeading">Welcome back, Elena</h1>
+            <p id="viewSubheading">Seated at Table 07 &bull; Trattoria Sol</p>
+          </div>
+        </div>
+
+        <div class="topbar-actions">
+          <button type="button" class="waiter-btn" id="callWaiterBtn">
+            <i class="fas fa-bell"></i>
+            <span>Call Server</span>
+          </button>
+        </div>
+      </header>
+
+      <main class="dash-content">
+        <!-- VIEW 1: OVERVIEW -->
+        <section class="dash-view active" id="view-overview">
+          <div class="kpi-grid">
+            <article class="kpi-card">
+              <div class="kpi-top">
+                <span>Active Table Bill</span>
+                <span class="kpi-icon"><i class="fas fa-receipt"></i></span>
+              </div>
+              <div class="kpi-value" id="kpiActiveBill">$44.50</div>
+              <div class="kpi-sub">2 items preparing at kitchen</div>
+            </article>
+            <article class="kpi-card">
+              <div class="kpi-top">
+                <span>Estimated Arrival</span>
+                <span class="kpi-icon"><i class="fas fa-clock"></i></span>
+              </div>
+              <div class="kpi-value">8 min</div>
+              <div class="kpi-sub">Order #SD-4091 on pass</div>
+            </article>
+            <article class="kpi-card">
+              <div class="kpi-top">
+                <span>Loyalty Points</span>
+                <span class="kpi-icon"><i class="fas fa-star"></i></span>
+              </div>
+              <div class="kpi-value" id="kpiPoints">680 pts</div>
+              <div class="kpi-sub">120 pts to free dessert</div>
+            </article>
+            <article class="kpi-card">
+              <div class="kpi-top">
+                <span>Saved Favorites</span>
+                <span class="kpi-icon"><i class="fas fa-heart"></i></span>
+              </div>
+              <div class="kpi-value" id="kpiFavorites">3 dishes</div>
+              <div class="kpi-sub">Allergen filter: Nut-Free</div>
+            </article>
+          </div>
+
+          <div class="overview-grid">
+            <article class="panel">
+              <div class="panel-head">
+                <h2>Live Kitchen Order #SD-4091</h2>
+                <span class="status-pill" id="liveOrderStatus">Preparing in Kitchen</span>
+              </div>
+
+              <div class="stepper">
+                <div class="step-node done"><i class="fas fa-check"></i> Order Sent</div>
+                <div class="step-node current" id="stepPrep"><i class="fas fa-fire"></i> Prepping</div>
+                <div class="step-node" id="stepPlate"><i class="fas fa-concierge-bell"></i> Plating</div>
+                <div class="step-node" id="stepTable"><i class="fas fa-utensils"></i> At Table 07</div>
+              </div>
+
+              <ul class="order-item-list" id="overviewOrderList">
+                <li class="order-item-row">
+                  <div>
+                    <strong>Truffle Wild Mushroom Risotto &times; 1</strong>
+                    <span>Gluten-Free &bull; Extra Parmesan</span>
+                  </div>
+                  <strong>$26.00</strong>
+                </li>
+                <li class="order-item-row">
+                  <div>
+                    <strong>Burrata &amp; Fig Flatbread &times; 1</strong>
+                    <span>Wood-Fired Sourdough</span>
+                  </div>
+                  <strong>$18.50</strong>
+                </li>
+              </ul>
+
+              <div class="order-total-bar">
+                <span>Current Table Subtotal</span>
+                <span id="overviewSubtotal">$44.50</span>
+              </div>
+            </article>
+
+            <article class="panel">
+              <div class="panel-head">
+                <h2>Quick Actions</h2>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                <button type="button" class="btn-sm primary" data-jump="menu" style="display: flex; align-items: center; gap: 0.6rem; justify-content: flex-start; text-align: left;">
+                  <i class="fas fa-plus" style="width: 1rem; text-align: center;"></i> Add More Items to Table 07
+                </button>
+                <button type="button" class="btn-sm" id="splitBillBtn" style="display: flex; align-items: center; gap: 0.6rem; justify-content: flex-start; text-align: left;">
+                  <i class="fas fa-users" style="width: 1rem; text-align: center;"></i> Request Split Bill Link
+                </button>
+                <button type="button" class="btn-sm" data-jump="orders" style="display: flex; align-items: center; gap: 0.6rem; justify-content: flex-start; text-align: left;">
+                  <i class="fas fa-file-invoice" style="width: 1rem; text-align: center;"></i> View Past Receipts
+                </button>
+                <button type="button" class="btn-sm" data-jump="allergens" style="display: flex; align-items: center; gap: 0.6rem; justify-content: flex-start; text-align: left;">
+                  <i class="fas fa-heart" style="width: 1rem; text-align: center;"></i> Update Dietary Profile
+                </button>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <!-- VIEW 2: ORDER MENU & CART -->
+        <section class="dash-view" id="view-menu">
+          <div class="filter-bar">
+            <div class="pill-group" id="menuCatGroup">
+              <button type="button" class="filter-pill active" data-cat="all">All Items</button>
+              <button type="button" class="filter-pill" data-cat="gluten-free">Gluten-Free</button>
+              <button type="button" class="filter-pill" data-cat="vegan">Vegan</button>
+            </div>
+            <div class="pill-group">
+              <button type="button" class="filter-pill" id="safeFilterBtn">
+                <i class="fas fa-check-circle"></i> Match My Allergens
+              </button>
+            </div>
+          </div>
+
+          <div class="menu-cart-layout">
+            <div class="menu-grid" id="dishGrid"></div>
+
+            <aside class="panel">
+              <div class="panel-head">
+                <h2>Table 07 Tray</h2>
+                <span class="mono" id="cartItemCount" style="font-size: 0.8rem; color: var(--accent);">2 items</span>
+              </div>
+              <ul class="order-item-list" id="cartList"></ul>
+              <div class="order-total-bar" style="margin-bottom: 1rem;">
+                <span>Tray Total</span>
+                <span id="cartTotal">$0.00</span>
+              </div>
+              <button type="button" class="btn-sm primary" id="placeOrderBtn" style="width: 100%; padding: 0.85rem;">
+                <i class="fas fa-paper-plane"></i> Send Order to Kitchen
+              </button>
+            </aside>
+          </div>
+        </section>
+
+        <!-- VIEW 3: ORDERS & RECEIPTS -->
+        <section class="dash-view" id="view-orders">
+          <article class="panel">
+            <div class="panel-head">
+              <h2>Order History &amp; Digital Receipts</h2>
+              <span class="mono" style="font-size: 0.8rem; color: var(--text-secondary);">ALL VERIFIED VISITS</span>
+            </div>
+            <div class="table-wrap">
+              <table class="orders-table">
+                <thead>
+                  <tr>
+                    <th>Receipt</th>
+                    <th>Venue</th>
+                    <th>Items</th>
+                    <th>Status</th>
+                    <th>Total</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="ordersTableBody">
+                  <tr>
+                    <td class="mono">#SD-4091</td>
+                    <td>Trattoria Sol (Table 07)</td>
+                    <td>Mushroom Risotto, Burrata Flatbread</td>
+                    <td><span class="status-pill">Preparing</span></td>
+                    <td><strong>$44.50</strong></td>
+                    <td><button type="button" class="btn-sm reorder-btn" data-items="Mushroom Risotto, Burrata Flatbread">Reorder</button></td>
+                  </tr>
+                  <tr>
+                    <td class="mono">#SD-3984</td>
+                    <td>Bistro Verde</td>
+                    <td>Burrata Flatbread, Sparkling Water</td>
+                    <td><span class="status-pill ready">Paid</span></td>
+                    <td><strong>$24.00</strong></td>
+                    <td><button type="button" class="btn-sm reorder-btn" data-items="Burrata Flatbread">Reorder</button></td>
+                  </tr>
+                  <tr>
+                    <td class="mono">#SD-3812</td>
+                    <td>Osteria Nova</td>
+                    <td>Herb Grilled Sea Bass</td>
+                    <td><span class="status-pill ready">Paid</span></td>
+                    <td><strong>$29.00</strong></td>
+                    <td><button type="button" class="btn-sm reorder-btn" data-items="Herb Grilled Sea Bass">Reorder</button></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </article>
+        </section>
+
+        <!-- VIEW 4: SAVED & ALLERGENS -->
+        <section class="dash-view" id="view-allergens">
+          <div class="panel" style="margin-bottom: 1.35rem;">
+            <div class="panel-head">
+              <h2>Dietary &amp; Allergen Guardrails</h2>
+              <span style="font-size: 0.84rem; color: var(--text-secondary);">Auto-applied when scanning any ScanDine QR menu</span>
+            </div>
+            <div class="pref-grid">
+              <label class="pref-card">
+                <div>
+                  <strong>Nut-Free Only</strong>
+                  <div style="font-size: 0.8rem; color: var(--text-secondary);">Hide dishes containing tree nuts</div>
+                </div>
+                <input type="checkbox" class="diet-pref" value="nut-free" checked>
+              </label>
+              <label class="pref-card">
+                <div>
+                  <strong>Gluten-Free</strong>
+                  <div style="font-size: 0.8rem; color: var(--text-secondary);">Highlight celiac-safe dishes</div>
+                </div>
+                <input type="checkbox" class="diet-pref" value="gluten-free">
+              </label>
+              <label class="pref-card">
+                <div>
+                  <strong>Plant-Based / Vegan</strong>
+                  <div style="font-size: 0.8rem; color: var(--text-secondary);">Filter dairy &amp; meat items</div>
+                </div>
+                <input type="checkbox" class="diet-pref" value="vegan">
+              </label>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-head">
+              <h2>Saved Favorite Dishes</h2>
+            </div>
+            <ul class="order-item-list" id="favoritesList"></ul>
+          </div>
+        </section>
+
+        <!-- VIEW 5: REWARDS -->
+        <section class="dash-view" id="view-rewards">
+          <div class="overview-grid">
+            <article class="panel">
+              <div class="panel-head">
+                <h2>ScanDine Gold Member</h2>
+                <span class="status-pill ready" id="rewardPtsBadge">680 / 800 pts</span>
+              </div>
+              <p style="color: var(--text-secondary); font-size: 0.92rem;">Earn 10 points per $1 spent via contactless QR checkout across partner restaurants.</p>
+              <div class="reward-meter">
+                <div class="reward-fill" id="rewardFill" style="width: 85%;"></div>
+              </div>
+              <p style="font-size: 0.84rem; color: var(--text-secondary);">120 points away from a complimentary artisan dessert or espresso flight.</p>
+            </article>
+
+            <article class="panel">
+              <div class="panel-head">
+                <h2>Available Perks</h2>
+              </div>
+              <ul class="order-item-list">
+                <li class="order-item-row">
+                  <div>
+                    <strong>Free Craft Espresso</strong>
+                    <span>250 pts</span>
+                  </div>
+                  <button type="button" class="btn-sm primary redeem-btn" data-cost="250" data-name="Free Craft Espresso">Redeem</button>
+                </li>
+                <li class="order-item-row">
+                  <div>
+                    <strong>$10 Off Table Check</strong>
+                    <span>500 pts</span>
+                  </div>
+                  <button type="button" class="btn-sm primary redeem-btn" data-cost="500" data-name="$10 Off Table Check">Redeem</button>
+                </li>
+              </ul>
+            </article>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <div class="toast-msg" id="toastMsg" role="status" aria-live="polite"></div>
+
+  <script>
+    (function() {
+      /* ----- THEME, RTL & MOBILE SIDEBAR ----- */
+      const htmlEl = document.documentElement;
+      const themeToggle = document.getElementById('themeToggle');
+      const themeIcon = document.getElementById('themeIcon');
+      const rtlToggle = document.getElementById('rtlToggle');
+      const appSidebar = document.getElementById('appSidebar');
+      const sidebarBackdrop = document.getElementById('sidebarBackdrop');
+
+      function applyTheme(dark) {
+        if (dark) {
+          htmlEl.setAttribute('data-theme', 'dark');
+          themeIcon.classList.replace('fa-moon', 'fa-sun');
+          localStorage.setItem('theme', 'dark');
+        } else {
+          htmlEl.removeAttribute('data-theme');
+          themeIcon.classList.replace('fa-sun', 'fa-moon');
+          localStorage.setItem('theme', 'light');
+        }
+      }
+      if (localStorage.getItem('theme') === 'dark') applyTheme(true);
+      themeToggle.addEventListener('click', () => applyTheme(htmlEl.getAttribute('data-theme') !== 'dark'));
+
+      function applyDir(rtl) {
+        htmlEl.setAttribute('dir', rtl ? 'rtl' : 'ltr');
+        localStorage.setItem('dir', rtl ? 'rtl' : 'ltr');
+      }
+      if (localStorage.getItem('dir') === 'rtl') applyDir(true);
+      rtlToggle.addEventListener('click', () => applyDir(htmlEl.getAttribute('dir') !== 'rtl'));
+
+      function toggleSidebar(open) {
+        appSidebar.classList.toggle('open', open);
+        sidebarBackdrop.classList.toggle('open', open);
+      }
+      document.getElementById('openSidebarBtn').addEventListener('click', () => toggleSidebar(true));
+      document.getElementById('sidebarCloseBtn').addEventListener('click', () => toggleSidebar(false));
+      sidebarBackdrop.addEventListener('click', () => toggleSidebar(false));
+
+      /* ----- TOAST HELPER ----- */
+      const toastEl = document.getElementById('toastMsg');
+      let toastTimer = null;
+      function showToast(msg) {
+        toastEl.textContent = msg;
+        toastEl.classList.add('show');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => toastEl.classList.remove('show'), 2400);
+      }
+
+      /* ----- VIEW NAVIGATION ----- */
+      const viewMeta = {
+        overview: { title: 'Welcome back, Elena', sub: 'Seated at Table 07 • Trattoria Sol' },
+        menu: { title: 'Table 07 Digital Menu', sub: 'Instant QR ordering — zero app download' },
+        orders: { title: 'Orders & Receipts', sub: 'Your verified contactless dining history' },
+        allergens: { title: 'Saved & Allergen Profile', sub: 'Synced automatically to every QR scan' },
+        rewards: { title: 'Rewards & Perks', sub: 'Earn points automatically on every table check' }
+      };
+
+      const viewHeading = document.getElementById('viewHeading');
+      const viewSubheading = document.getElementById('viewSubheading');
+
+      function switchView(name) {
+        document.querySelectorAll('.side-link').forEach(b => b.classList.toggle('active', b.dataset.view === name));
+        document.querySelectorAll('.dash-view').forEach(v => v.classList.toggle('active', v.id === 'view-' + name));
+        if (viewMeta[name]) {
+          viewHeading.textContent = viewMeta[name].title;
+          viewSubheading.textContent = viewMeta[name].sub;
+        }
+        toggleSidebar(false);
+      }
+
+      document.querySelectorAll('.side-link').forEach(btn => {
+        btn.addEventListener('click', () => switchView(btn.dataset.view));
+      });
+      document.querySelectorAll('[data-jump]').forEach(btn => {
+        btn.addEventListener('click', () => switchView(btn.dataset.jump));
+      });
+
+      /* ----- CALL SERVER & SPLIT BILL ----- */
+      const callWaiterBtn = document.getElementById('callWaiterBtn');
+      callWaiterBtn.addEventListener('click', () => {
+        callWaiterBtn.classList.add('called');
+        callWaiterBtn.innerHTML = '<i class="fas fa-check"></i><span>Server Notified</span>';
+        showToast('Server notified for Table 07 — on the way!');
+        setTimeout(() => {
+          callWaiterBtn.classList.remove('called');
+          callWaiterBtn.innerHTML = '<i class="fas fa-bell"></i><span>Call Server</span>';
+        }, 3500);
+      });
+
+      document.getElementById('splitBillBtn').addEventListener('click', () => {
+        showToast('Split-bill QR link copied for Table 07!');
+      });
+
+      /* ----- MENU, CART & FAVORITES ----- */
+      const dishes = [
+        { id: 1, name: 'Truffle Wild Mushroom Risotto', cat: 'mains', price: 26.00, desc: 'Arborio rice, roasted porcini, aged parmesan.', tags: ['nut-free', 'gluten-free'], fav: true },
+        { id: 2, name: 'Herb Grilled Sea Bass', cat: 'mains', price: 29.00, desc: 'Charred lemon, blistered cherry tomatoes, olive oil.', tags: ['nut-free', 'gluten-free'], fav: true },
+        { id: 3, name: 'Burrata & Fig Flatbread', cat: 'mains', price: 18.50, desc: 'Wood-fired sourdough, fresh basil, balsamic glaze.', tags: ['nut-free'], fav: false },
+        { id: 4, name: 'Roasted Cauliflower Bowl', cat: 'mains', price: 19.00, desc: 'Tahini herb dressing, quinoa, crispy chickpeas.', tags: ['nut-free', 'gluten-free', 'vegan'], fav: false }
+      ];
+
+      let cart = [
+        { id: 1, name: 'Truffle Wild Mushroom Risotto', price: 26.00, qty: 1 },
+        { id: 3, name: 'Burrata & Fig Flatbread', price: 18.50, qty: 1 }
+      ];
+      let activeCat = 'all';
+      let matchAllergens = false;
+      let points = 680;
+
+      const dishGrid = document.getElementById('dishGrid');
+      const cartList = document.getElementById('cartList');
+      const cartTotal = document.getElementById('cartTotal');
+      const cartItemCount = document.getElementById('cartItemCount');
+      const cartBadgeCount = document.getElementById('cartBadgeCount');
+      const favoritesList = document.getElementById('favoritesList');
+
+      function renderFavorites() {
+        const favs = dishes.filter(d => d.fav);
+        document.getElementById('kpiFavorites').textContent = favs.length + ' dishes';
+        favoritesList.innerHTML = favs.length
+          ? favs.map(d => '<li class="order-item-row"><div><strong>' + d.name + '</strong><span>$' + d.price.toFixed(2) + '</span></div><button type="button" class="btn-sm primary" onclick="window.addDishToCart(' + d.id + ')">Add to Tray</button></li>').join('')
+          : '<li class="order-item-row"><span>No saved dishes yet. Tap the heart on any dish in Order Menu.</span></li>';
+      }
+
+      function renderMenu() {
+        const prefs = Array.from(document.querySelectorAll('.diet-pref:checked')).map(c => c.value);
+        dishGrid.innerHTML = dishes.map(d => {
+          const catOk = activeCat === 'all' || d.tags.includes(activeCat);
+          const prefOk = !matchAllergens || prefs.every(p => d.tags.includes(p));
+          const hiddenCls = (catOk && prefOk) ? '' : ' is-hidden';
+          return '<article class="dish-card' + hiddenCls + '">' +
+            '<div class="dish-top"><span class="dish-tag">' + d.tags.slice(0, 2).join(' • ') + '</span>' +
+            '<button type="button" class="fav-heart ' + (d.fav ? 'liked' : '') + '" onclick="window.toggleDishFav(' + d.id + ')" aria-label="Favorite"><i class="fas fa-heart"></i></button></div>' +
+            '<h3>' + d.name + '</h3><p>' + d.desc + '</p>' +
+            '<div class="dish-foot"><span class="dish-price">$' + d.price.toFixed(2) + '</span>' +
+            '<button type="button" class="btn-sm primary" onclick="window.addDishToCart(' + d.id + ')">+ Add</button></div></article>';
+        }).join('');
+      }
+
+      function renderCart() {
+        let total = 0;
+        let count = 0;
+        cartList.innerHTML = cart.length ? cart.map(item => {
+          total += item.price * item.qty;
+          count += item.qty;
+          return '<li class="order-item-row"><div><strong>' + item.name + ' &times; ' + item.qty + '</strong><span>$' + (item.price * item.qty).toFixed(2) + '</span></div>' +
+            '<button type="button" class="btn-sm" onclick="window.removeFromCart(' + item.id + ')">&minus;</button></li>';
+        }).join('') : '<li class="order-item-row"><span>Your tray is empty. Add items from the menu.</span></li>';
+        cartTotal.textContent = '$' + total.toFixed(2);
+        cartItemCount.textContent = count + (count === 1 ? ' item' : ' items');
+        cartBadgeCount.textContent = String(count);
+      }
+
+      window.addDishToCart = function(id) {
+        const dish = dishes.find(d => d.id === id);
+        if (!dish) return;
+        const existing = cart.find(c => c.id === id);
+        if (existing) existing.qty += 1; else cart.push({ id: dish.id, name: dish.name, price: dish.price, qty: 1 });
+        renderCart();
+        showToast('Added ' + dish.name + ' to Table 07 tray');
+      };
+
+      window.removeFromCart = function(id) {
+        const idx = cart.findIndex(c => c.id === id);
+        if (idx === -1) return;
+        if (cart[idx].qty > 1) cart[idx].qty -= 1; else cart.splice(idx, 1);
+        renderCart();
+      };
+
+      window.toggleDishFav = function(id) {
+        const dish = dishes.find(d => d.id === id);
+        if (!dish) return;
+        dish.fav = !dish.fav;
+        renderMenu();
+        renderFavorites();
+      };
+
+      document.querySelectorAll('#menuCatGroup .filter-pill').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('#menuCatGroup .filter-pill').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          activeCat = btn.dataset.cat;
+          renderMenu();
+        });
+      });
+
+      const safeFilterBtn = document.getElementById('safeFilterBtn');
+      safeFilterBtn.addEventListener('click', () => {
+        matchAllergens = !matchAllergens;
+        safeFilterBtn.classList.toggle('active', matchAllergens);
+        renderMenu();
+      });
+
+      document.querySelectorAll('.diet-pref').forEach(cb => cb.addEventListener('change', renderMenu));
+
+      document.getElementById('placeOrderBtn').addEventListener('click', () => {
+        if (!cart.length) {
+          showToast('Add at least one item before sending.');
+          return;
+        }
+        const total = cart.reduce((s, i) => s + i.price * i.qty, 0);
+        const summary = cart.map(i => i.name + (i.qty > 1 ? ' x' + i.qty : '')).join(', ');
+        const newId = '#SD-' + Math.floor(4100 + Math.random() * 899);
+        const tbody = document.getElementById('ordersTableBody');
+        const tr = document.createElement('tr');
+        tr.innerHTML = '<td class="mono">' + newId + '</td><td>Trattoria Sol (Table 07)</td><td>' + summary + '</td>' +
+          '<td><span class="status-pill">Preparing</span></td><td><strong>$' + total.toFixed(2) + '</strong></td>' +
+          '<td><button type="button" class="btn-sm reorder-btn" data-items="' + summary + '">Reorder</button></td>';
+        tbody.prepend(tr);
+
+        document.getElementById('kpiActiveBill').textContent = '$' + total.toFixed(2);
+        document.getElementById('overviewSubtotal').textContent = '$' + total.toFixed(2);
+        points += Math.round(total * 10);
+        updatePointsUi();
+        cart = [];
+        renderCart();
+        showToast('Order ' + newId + ' sent to the kitchen!');
+      });
+
+      document.getElementById('ordersTableBody').addEventListener('click', (e) => {
+        const btn = e.target.closest('.reorder-btn');
+        if (!btn) return;
+        showToast('Added "' + btn.dataset.items + '" to Table 07 tray!');
+        switchView('menu');
+      });
+
+      function updatePointsUi() {
+        document.getElementById('kpiPoints').textContent = points + ' pts';
+        document.getElementById('rewardPtsBadge').textContent = points + ' / 800 pts';
+        document.getElementById('rewardFill').style.width = Math.min(100, Math.round((points / 800) * 100)) + '%';
+      }
+
+      document.querySelectorAll('.redeem-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const cost = Number(btn.dataset.cost);
+          if (points < cost) {
+            showToast('Need ' + (cost - points) + ' more points for this perk.');
+            return;
+          }
+          points -= cost;
+          updatePointsUi();
+          showToast('Redeemed: ' + btn.dataset.name + ' applied to Table 07!');
+        });
+      });
+
+      renderMenu();
+      renderCart();
+      renderFavorites();
+      updatePointsUi();
+    })();
+  </script>
+</body>
+</html>

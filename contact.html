@@ -1,0 +1,2304 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ScanDine | Contact &amp; Table-Side Concierge</title>
+  <link rel="icon" type="image/svg+xml" href="images/favicon.svg">
+  <link rel="icon" type="image/png" href="images/favicon.png">
+  <link rel="shortcut icon" href="favicon.ico">
+  <link rel="apple-touch-icon" href="images/favicon.png">
+  <!-- Font Awesome 6 (free) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+  <style>
+    /* ----- GLOBAL RESET & VARIABLES (Shared ScanDine Theme) ----- */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --navbar-bg: #ffffff;
+      --footer-bg: #f8fafc;
+      --navbar-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+      --text-primary: #1e1e2f;
+      --text-secondary: #4a4a6a;
+      --accent: #f97316;
+      --accent-hover: #ea580c;
+      --accent-soft: rgba(249, 115, 22, 0.12);
+      --dropdown-bg: #ffffff;
+      --dropdown-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+      --border-light: #e9e9f0;
+      --icon-color: #4a4a6a;
+      --transition: all 0.22s ease;
+
+      /* Page Surfaces */
+      --surface-color: #ffffff;
+      --surface-alt: #f1f5f9;
+      --surface-elevated: #ffffff;
+      --wood-dark: #231915;
+      --wood-mid: #3a2921;
+      --brass: #d4a373;
+      --success: #10b981;
+      --success-soft: rgba(16, 185, 129, 0.14);
+      --danger: #ef4444;
+      --card-shadow: 0 18px 45px -18px rgba(15, 23, 42, 0.12);
+    }
+
+    /* DARK MODE VARIABLES */
+    html[data-theme="dark"] {
+      --navbar-bg: #12121c;
+      --footer-bg: #0f0f16;
+      --navbar-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+      --text-primary: #f0f0f5;
+      --text-secondary: #b0b0c0;
+      --accent: #fb923c;
+      --accent-hover: #f97316;
+      --accent-soft: rgba(251, 146, 60, 0.16);
+      --dropdown-bg: #1e1e2c;
+      --dropdown-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.6);
+      --border-light: #2a2a3a;
+      --icon-color: #c0c0d0;
+
+      --surface-color: #171724;
+      --surface-alt: #101019;
+      --surface-elevated: #1e1e2c;
+      --card-shadow: 0 18px 45px -18px rgba(0, 0, 0, 0.55);
+    }
+
+    body {
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+      background-color: #f8fafc;
+      color: var(--text-primary);
+      transition: background-color 0.3s, color 0.3s;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    html[data-theme="dark"] body { background-color: #0b0b12; }
+
+    main { flex: 1; }
+
+    /* =========================================
+       NAVBAR (SHARED STRUCTURE)
+       ========================================= */
+    .navbar {
+      background: var(--navbar-bg);
+      box-shadow: var(--navbar-shadow);
+      padding: 0.75rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      transition: background 0.2s, box-shadow 0.2s;
+      flex-wrap: wrap;
+    }
+
+    .navbar__brand {
+      font-size: 1.6rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: var(--text-primary);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+    }
+
+    .navbar__brand span { color: var(--accent); }
+
+    .navbar__menu {
+      display: flex;
+      align-items: center;
+      list-style: none;
+      gap: 1.75rem;
+      margin: 0;
+      padding: 0;
+    }
+
+    .navbar__item {
+      position: relative;
+      display: flex;
+      align-items: center;
+      height: 100%;
+    }
+
+    .navbar__link {
+      text-decoration: none;
+      color: var(--text-primary);
+      font-weight: 500;
+      font-size: 0.95rem;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      padding: 0.5rem 0;
+      transition: var(--transition);
+      border-bottom: 2px solid transparent;
+    }
+
+    .navbar__link:hover,
+    .navbar__link.is-active {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+    }
+
+    .navbar__link i {
+      font-size: 0.7rem;
+      color: var(--text-secondary);
+      transition: transform 0.2s;
+    }
+
+    .navbar__item:hover .navbar__link i { transform: rotate(180deg); }
+
+    .navbar__link--login {
+      background-color: var(--accent);
+      color: #ffffff !important;
+      padding: 0.5rem 1.25rem !important;
+      border-radius: 0.5rem;
+      border-bottom: none !important;
+      font-weight: 600;
+      transition: var(--transition);
+    }
+
+    .navbar__link--login:hover {
+      background-color: var(--accent-hover);
+      color: #ffffff !important;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);
+    }
+
+    .dropdown {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      min-width: 200px;
+      background: var(--dropdown-bg);
+      border-radius: 0.75rem;
+      box-shadow: var(--dropdown-shadow);
+      padding: 0.5rem 0;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(8px);
+      transition: all 0.2s ease;
+      border: 1px solid var(--border-light);
+      z-index: 100;
+      list-style: none;
+    }
+
+    .navbar__item:hover .dropdown {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+
+    .dropdown li a {
+      display: block;
+      padding: 0.5rem 1.25rem;
+      text-decoration: none;
+      color: var(--text-primary);
+      font-size: 0.9rem;
+      transition: background 0.15s;
+    }
+
+    .dropdown li a:hover { background: var(--border-light); color: var(--accent); }
+
+    .navbar__icons {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .icon-btn {
+      background: transparent;
+      border: none;
+      font-size: 1.15rem;
+      color: var(--icon-color);
+      cursor: pointer;
+      padding: 0.4rem;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: var(--transition);
+      width: 2.2rem;
+      height: 2.2rem;
+    }
+
+    .icon-btn:hover { background: var(--border-light); color: var(--accent); }
+
+    .hamburger {
+      display: none;
+      background: transparent;
+      border: none;
+      font-size: 1.5rem;
+      color: var(--text-primary);
+      cursor: pointer;
+      padding: 0.4rem;
+      border-radius: 0.5rem;
+      transition: var(--transition);
+    }
+
+    .hamburger:hover { background: var(--border-light); }
+
+    .mobile-menu {
+      display: none;
+      width: 100%;
+      background: var(--navbar-bg);
+      padding: 1rem 0;
+      border-top: 1px solid var(--border-light);
+      transition: all 0.25s ease;
+    }
+
+    .mobile-menu.active { display: block; }
+
+    .mobile-menu__list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+      padding: 0 1rem;
+    }
+
+    .mobile-menu__link {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.75rem 1rem;
+      text-decoration: none;
+      color: var(--text-primary);
+      font-weight: 500;
+      border-radius: 0.5rem;
+      transition: background 0.15s;
+    }
+
+    .mobile-menu__link:hover,
+    .mobile-menu__link.is-active { background: var(--border-light); color: var(--accent); }
+    .mobile-menu__link i { font-size: 0.75rem; transition: transform 0.2s; }
+
+    .mobile-menu__link--login {
+      background-color: var(--accent);
+      color: #ffffff !important;
+      justify-content: center;
+      margin: 0.5rem 1rem;
+      padding: 0.8rem;
+      font-weight: 600;
+    }
+
+    .mobile-menu__link--login:hover {
+      background-color: var(--accent-hover);
+      color: #ffffff !important;
+    }
+
+    .mobile-submenu {
+      list-style: none;
+      padding-left: 1.5rem;
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.25s ease;
+    }
+
+    .mobile-submenu.open { max-height: 300px; }
+
+    .mobile-submenu li a {
+      display: block;
+      padding: 0.5rem 1rem;
+      text-decoration: none;
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      border-radius: 0.4rem;
+    }
+
+    .mobile-submenu li a:hover { background: var(--border-light); color: var(--accent); }
+
+    .mobile-preferences {
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 1.5rem;
+      padding: 1rem 2rem;
+      margin-top: 0.5rem;
+      border-top: 1px solid var(--border-light);
+    }
+
+    .mobile-pref-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    .mobile-pref-item .icon-btn { width: 2rem; height: 2rem; font-size: 1.1rem; }
+
+    html[dir="rtl"] .dropdown { left: auto; right: 0; }
+    html[dir="rtl"] .mobile-submenu { padding-left: 0; padding-right: 1.5rem; }
+    html[dir="rtl"] .mobile-preferences { flex-direction: row-reverse; justify-content: flex-end; }
+
+    @media screen and (max-width: 992px) {
+      .navbar { padding: 0.75rem 1.25rem; }
+      .navbar__menu { display: none; }
+      .navbar__icons .desktop-only { display: none; }
+      .hamburger { display: flex; }
+      .mobile-menu {
+        display: flex;
+        flex-direction: column;
+        position: fixed;
+        top: 0;
+        right: 0;
+        left: auto;
+        width: min(320px, 85vw);
+        height: 100vh;
+        height: 100dvh;
+        padding: 1.25rem 0 2rem;
+        border-top: none;
+        border-left: 1px solid var(--border-light);
+        box-shadow: -12px 0 36px rgba(0, 0, 0, 0.25);
+        z-index: 1200;
+        overflow-y: auto;
+        transform: translateX(100%);
+        visibility: hidden;
+        transition: transform 0.28s ease, visibility 0.28s ease;
+      }
+      .mobile-menu.active {
+        display: flex;
+        transform: translateX(0);
+        visibility: visible;
+      }
+      .mobile-drawer-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 1.25rem 1rem;
+        margin-bottom: 0.75rem;
+        border-bottom: 1px solid var(--border-light);
+      }
+      .mobile-drawer-close {
+        background: transparent;
+        border: none;
+        font-size: 1.35rem;
+        color: var(--text-primary);
+        cursor: pointer;
+        padding: 0.35rem 0.55rem;
+        border-radius: 0.5rem;
+        transition: var(--transition);
+      }
+      .mobile-drawer-close:hover { background: var(--border-light); color: var(--accent); }
+      .mobile-backdrop {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(10, 10, 18, 0.55);
+        backdrop-filter: blur(2px);
+        z-index: 1150;
+      }
+      .mobile-backdrop.active { display: block; }
+    }
+
+    /* =========================================
+       SHARED PAGE LAYOUT HELPERS
+       ========================================= */
+    .sc-container {
+      max-width: 1220px;
+      margin: 0 auto;
+      padding: 0 2rem;
+    }
+
+    .sc-mono {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
+
+    .sc-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.42rem 0.95rem;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      border: 1px solid rgba(249, 115, 22, 0.25);
+    }
+
+    .pulse-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--success);
+      box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.25);
+      flex-shrink: 0;
+    }
+
+    .sec-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 2rem;
+      margin-bottom: 2.75rem;
+      flex-wrap: wrap;
+    }
+
+    .sec-header h2 {
+      font-size: clamp(1.9rem, 3.4vw, 2.85rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.12;
+      margin-top: 0.75rem;
+      color: var(--text-primary);
+    }
+
+    .sec-header p {
+      max-width: 460px;
+      color: var(--text-secondary);
+      font-size: 1rem;
+      line-height: 1.65;
+    }
+
+    /* =========================================
+       1. TABLE-SIDE CONCIERGE FULL-SCREEN HERO
+       ========================================= */
+    .concierge-hero {
+      position: relative;
+      min-height: calc(100vh - 64px);
+      min-height: calc(100svh - 64px);
+      width: 100%;
+      padding: 4rem 0;
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+      border-bottom: 1px solid var(--border-light);
+      background-color: #121018;
+    }
+
+    .hero-bg-media {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      background:
+        radial-gradient(circle at 75% 28%, rgba(249, 115, 22, 0.28), transparent 45%),
+        radial-gradient(circle at 18% 80%, rgba(212, 163, 115, 0.16), transparent 45%),
+        linear-gradient(135deg, #121018 0%, #241914 55%, #11131e 100%);
+    }
+
+    .hero-bg-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+      display: block;
+    }
+
+    .hero-bg-overlay {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      background: linear-gradient(
+        105deg,
+        rgba(12, 12, 20, 0.88) 0%,
+        rgba(12, 12, 20, 0.72) 52%,
+        rgba(12, 12, 20, 0.54) 100%
+      );
+      pointer-events: none;
+    }
+
+    html[dir="rtl"] .hero-bg-overlay {
+      background: linear-gradient(
+        255deg,
+        rgba(12, 12, 20, 0.88) 0%,
+        rgba(12, 12, 20, 0.72) 52%,
+        rgba(12, 12, 20, 0.54) 100%
+      );
+    }
+
+    .concierge-hero .sc-container {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+    }
+
+    .hero-grid {
+      max-width: 680px;
+    }
+
+    .concierge-hero .sc-badge {
+      background: rgba(249, 115, 22, 0.18);
+      border-color: rgba(251, 146, 60, 0.45);
+      color: #fdba74;
+      backdrop-filter: blur(8px);
+    }
+
+    .hero-copy h1 {
+      font-size: clamp(2.5rem, 4.8vw, 4.1rem);
+      font-weight: 900;
+      line-height: 1.05;
+      letter-spacing: -0.035em;
+      margin: 1.15rem 0 1.25rem;
+      color: #ffffff;
+      text-shadow: 0 4px 24px rgba(0, 0, 0, 0.35);
+    }
+
+    .hero-copy h1 span {
+      color: #fb923c;
+      position: relative;
+      display: inline-block;
+    }
+
+    .hero-copy h1 span::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 4px;
+      height: 6px;
+      border-radius: 999px;
+      background: rgba(251, 146, 60, 0.32);
+    }
+
+    .hero-lead {
+      font-size: 1.1rem;
+      color: rgba(241, 245, 249, 0.88);
+      line-height: 1.7;
+      max-width: 540px;
+      margin-bottom: 2rem;
+    }
+
+    .hero-actions {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .btn-primary-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      background: var(--accent);
+      color: #ffffff;
+      padding: 0.95rem 1.6rem;
+      border-radius: 0.85rem;
+      font-weight: 700;
+      font-size: 0.96rem;
+      text-decoration: none;
+      border: none;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .btn-primary-cta:hover {
+      background: var(--accent-hover);
+      transform: translateY(-2px);
+      box-shadow: 0 10px 24px -8px rgba(249, 115, 22, 0.5);
+    }
+
+    .btn-ghost-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.55rem;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      color: #ffffff;
+      padding: 0.95rem 1.4rem;
+      border-radius: 0.85rem;
+      font-weight: 600;
+      font-size: 0.94rem;
+      text-decoration: none;
+      border: 1px solid rgba(255, 255, 255, 0.24);
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .btn-ghost-cta:hover {
+      border-color: #fb923c;
+      color: #fdba74;
+      background: rgba(255, 255, 255, 0.16);
+    }
+
+    /* =========================================
+       2. DIRECT HOSPITALITY CHANNELS & CALLBACK
+       ========================================= */
+    .channels-section {
+      padding: 5.5rem 0;
+    }
+
+    .channels-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.75rem;
+    }
+
+    .channel-card {
+      background: var(--surface-color);
+      border: 1px solid var(--border-light);
+      border-radius: 1.5rem;
+      overflow: hidden;
+      box-shadow: var(--card-shadow);
+      display: flex;
+      flex-direction: column;
+      transition: var(--transition);
+    }
+
+    .channel-card:hover {
+      border-color: var(--accent);
+      transform: translateY(-4px);
+    }
+
+    .channel-media {
+      height: 180px;
+      position: relative;
+      overflow: hidden;
+      background: #181826;
+    }
+
+    .channel-media img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.45s ease;
+    }
+
+    .channel-card:hover .channel-media img {
+      transform: scale(1.05);
+    }
+
+    .channel-media::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(12, 12, 20, 0.78), transparent 60%);
+      pointer-events: none;
+    }
+
+    .channel-sla {
+      position: absolute;
+      bottom: 0.9rem;
+      left: 1rem;
+      z-index: 2;
+      background: rgba(15, 15, 24, 0.85);
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      padding: 0.35rem 0.8rem;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    html[dir="rtl"] .channel-sla {
+      left: auto;
+      right: 1rem;
+    }
+
+    .channel-body {
+      padding: 1.6rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.9rem;
+      flex: 1;
+    }
+
+    .channel-head {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+    }
+
+    .channel-icon {
+      width: 2.5rem;
+      height: 2.5rem;
+      border-radius: 0.75rem;
+      background: var(--accent-soft);
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      flex-shrink: 0;
+    }
+
+    .channel-head h3 {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: var(--text-primary);
+    }
+
+    .channel-body p {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    .channel-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      padding-top: 0.65rem;
+      border-top: 1px dashed var(--border-light);
+    }
+
+    .channel-copy-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+      background: var(--surface-alt);
+      border: 1px solid var(--border-light);
+      color: var(--text-primary);
+      padding: 0.6rem 0.85rem;
+      border-radius: 0.75rem;
+      font-family: inherit;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .channel-copy-row:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .channel-route-btn {
+      margin-top: auto;
+      width: 100%;
+      padding: 0.82rem 1rem;
+      border-radius: 0.85rem;
+      border: none;
+      background: var(--accent);
+      color: #ffffff;
+      font-family: inherit;
+      font-size: 0.88rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      transition: var(--transition);
+    }
+
+    .channel-route-btn:hover {
+      background: var(--accent-hover);
+    }
+
+    /* =========================================
+       3. WAITER'S ORDER-PAD & CHECK PRESENTER
+       ========================================= */
+    .orderpad-section {
+      padding: 5.5rem 0;
+      background: var(--surface-alt);
+      border-top: 1px solid var(--border-light);
+      border-bottom: 1px solid var(--border-light);
+    }
+
+    .orderpad-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 2.25rem;
+      align-items: start;
+    }
+
+    .pad-card {
+      background: var(--surface-color);
+      border: 1px solid var(--border-light);
+      border-radius: 1.75rem;
+      padding: 2.25rem;
+      box-shadow: var(--card-shadow);
+    }
+
+    .pad-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      padding-bottom: 1.25rem;
+      margin-bottom: 1.5rem;
+      border-bottom: 2px dashed var(--border-light);
+    }
+
+    .pad-header h3 {
+      font-size: 1.5rem;
+      font-weight: 800;
+    }
+
+    .pad-form {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    .pad-row-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    .pad-field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.45rem;
+    }
+
+    .pad-field label {
+      font-size: 0.86rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .pad-field input,
+    .pad-field select,
+    .pad-field textarea {
+      width: 100%;
+      padding: 0.85rem 1rem;
+      border-radius: 0.85rem;
+      border: 1px solid var(--border-light);
+      background: var(--surface-alt);
+      color: var(--text-primary);
+      font-family: inherit;
+      font-size: 0.94rem;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .pad-field input:focus,
+    .pad-field select:focus,
+    .pad-field textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.16);
+    }
+
+    .pad-field textarea {
+      min-height: 118px;
+      resize: vertical;
+    }
+
+    .pad-error {
+      color: var(--danger);
+      font-size: 0.8rem;
+      display: none;
+    }
+
+    .pad-field.has-error input,
+    .pad-field.has-error textarea {
+      border-color: var(--danger);
+    }
+
+    .pad-field.has-error .pad-error {
+      display: block;
+    }
+
+    /* Check Presenter Live Ticket */
+    .check-presenter {
+      background: var(--surface-color);
+      border: 1px solid var(--border-light);
+      border-radius: 1.75rem;
+      overflow: hidden;
+      box-shadow: var(--card-shadow);
+      position: sticky;
+      top: 96px;
+    }
+
+    .presenter-photo {
+      height: 185px;
+      position: relative;
+      background: #1a1614;
+      overflow: hidden;
+    }
+
+    .presenter-photo img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+      display: block;
+    }
+
+    .presenter-photo::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(15, 15, 24, 0.72), transparent 55%);
+      pointer-events: none;
+    }
+
+    .presenter-photo-tag {
+      position: absolute;
+      bottom: 0.85rem;
+      left: 1rem;
+      z-index: 2;
+      color: #ffffff;
+      font-size: 0.78rem;
+      font-weight: 700;
+      background: rgba(15, 15, 24, 0.78);
+      padding: 0.35rem 0.75rem;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+    }
+
+    html[dir="rtl"] .presenter-photo-tag {
+      left: auto;
+      right: 1rem;
+    }
+
+    .presenter-body {
+      padding: 1.65rem;
+    }
+
+    .presenter-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+      padding-bottom: 0.85rem;
+      border-bottom: 1px dashed var(--border-light);
+    }
+
+    .presenter-title h4 {
+      font-size: 1.1rem;
+      font-weight: 800;
+    }
+
+    .ticket-rows {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.65rem;
+      margin-bottom: 1.15rem;
+    }
+
+    .ticket-rows li {
+      display: flex;
+      justify-content: space-between;
+      gap: 0.85rem;
+      font-size: 0.84rem;
+      padding-bottom: 0.45rem;
+      border-bottom: 1px dotted var(--border-light);
+    }
+
+    .ticket-rows li span {
+      color: var(--text-secondary);
+    }
+
+    .ticket-rows li strong {
+      color: var(--text-primary);
+      text-align: right;
+    }
+
+    html[dir="rtl"] .ticket-rows li strong {
+      text-align: left;
+    }
+
+    .ticket-preview-note {
+      background: var(--surface-alt);
+      border: 1px solid var(--border-light);
+      border-radius: 0.85rem;
+      padding: 0.85rem 1rem;
+      font-size: 0.84rem;
+      color: var(--text-secondary);
+      line-height: 1.55;
+      min-height: 66px;
+    }
+
+    .ticket-confirmed-banner {
+      display: none;
+      margin-top: 1.1rem;
+      padding: 1rem;
+      border-radius: 1rem;
+      background: var(--success-soft);
+      border: 1px solid var(--success);
+      color: var(--text-primary);
+    }
+
+    .ticket-confirmed-banner.visible {
+      display: block;
+    }
+
+    .ticket-confirmed-banner strong {
+      color: var(--success);
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+      margin-bottom: 0.35rem;
+    }
+
+    .ticket-confirmed-banner p {
+      font-size: 0.84rem;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+
+    /* =========================================
+       4. GLOBAL STUDIOS & LIVE CLOCKS
+       ========================================= */
+    .studios-section {
+      padding: 5.5rem 0;
+    }
+
+    .studios-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+    }
+
+    .studio-card {
+      background: var(--surface-color);
+      border: 1px solid var(--border-light);
+      border-radius: 1.5rem;
+      padding: 1.75rem;
+      box-shadow: var(--card-shadow);
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      transition: var(--transition);
+    }
+
+    .studio-card:hover {
+      border-color: var(--accent);
+      transform: translateY(-4px);
+    }
+
+    .studio-media {
+      height: 165px;
+      border-radius: 1rem;
+      overflow: hidden;
+      border: 1px solid var(--border-light);
+    }
+
+    .studio-media img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.35s ease;
+    }
+
+    .studio-card:hover .studio-media img {
+      transform: scale(1.05);
+    }
+
+    .studio-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .studio-clock {
+      font-size: 0.82rem;
+      font-weight: 800;
+      color: var(--accent);
+      background: var(--accent-soft);
+      padding: 0.35rem 0.7rem;
+      border-radius: 0.55rem;
+    }
+
+    .studio-card h3 {
+      font-size: 1.25rem;
+      font-weight: 800;
+    }
+
+    .studio-card p {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    .studio-meta-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.55rem;
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      border-top: 1px solid var(--border-light);
+      padding-top: 0.9rem;
+    }
+
+    .studio-meta-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.6rem;
+    }
+
+    .studio-meta-list i {
+      color: var(--accent);
+      margin-top: 0.2rem;
+    }
+
+    .studio-copy-btn {
+      margin-top: auto;
+      width: 100%;
+      padding: 0.7rem 1rem;
+      border-radius: 0.8rem;
+      border: 1px solid var(--border-light);
+      background: var(--surface-alt);
+      color: var(--text-primary);
+      font-family: inherit;
+      font-size: 0.84rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .studio-copy-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    /* =========================================
+       5. SEARCHABLE HELP CENTER (#contact-faq)
+       ========================================= */
+    .faq-section {
+      padding: 4.5rem 0;
+      background: var(--surface-alt);
+      border-top: 1px solid var(--border-light);
+    }
+
+    .faq-split {
+      display: grid;
+      grid-template-columns: 0.85fr 1.15fr;
+      gap: 3rem;
+      align-items: start;
+    }
+
+    .faq-intro h2 {
+      font-size: clamp(1.85rem, 3vw, 2.5rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.14;
+      margin: 0.75rem 0 0.9rem;
+      color: var(--text-primary);
+    }
+
+    .faq-intro p {
+      color: var(--text-secondary);
+      font-size: 0.96rem;
+      line-height: 1.6;
+      margin-bottom: 1.5rem;
+    }
+
+    .faq-search {
+      position: relative;
+      width: 100%;
+      margin-bottom: 1rem;
+    }
+
+    .faq-search i {
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+    }
+
+    html[dir="rtl"] .faq-search i {
+      left: auto;
+      right: 1rem;
+    }
+
+    .faq-search input {
+      width: 100%;
+      padding: 0.78rem 1rem 0.78rem 2.5rem;
+      border-radius: 0.9rem;
+      border: 1px solid var(--border-light);
+      background: var(--surface-color);
+      color: var(--text-primary);
+      font-family: inherit;
+      font-size: 0.9rem;
+      outline: none;
+    }
+
+    html[dir="rtl"] .faq-search input {
+      padding: 0.78rem 2.5rem 0.78rem 1rem;
+    }
+
+    .faq-search input:focus {
+      border-color: var(--accent);
+    }
+
+    .faq-cats {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .faq-cat-btn {
+      padding: 0.48rem 0.9rem;
+      border-radius: 999px;
+      border: 1px solid var(--border-light);
+      background: var(--surface-color);
+      color: var(--text-secondary);
+      font-family: inherit;
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .faq-cat-btn.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #ffffff;
+    }
+
+    .faq-accordion {
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+    }
+
+    .faq-item {
+      background: var(--surface-color);
+      border: 1px solid var(--border-light);
+      border-radius: 1.2rem;
+      overflow: hidden;
+      transition: border-color 0.2s;
+    }
+
+    .faq-item.open {
+      border-color: var(--accent);
+    }
+
+    .faq-item.is-hidden {
+      display: none;
+    }
+
+    .faq-trigger {
+      width: 100%;
+      padding: 1.2rem 1.35rem;
+      background: transparent;
+      border: none;
+      color: var(--text-primary);
+      font-family: inherit;
+      font-size: 0.98rem;
+      font-weight: 700;
+      text-align: left;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    html[dir="rtl"] .faq-trigger {
+      text-align: right;
+    }
+
+    .faq-trigger i {
+      color: var(--accent);
+      transition: transform 0.22s ease;
+      flex-shrink: 0;
+    }
+
+    .faq-item.open .faq-trigger i {
+      transform: rotate(180deg);
+    }
+
+    .faq-answer {
+      display: none;
+      padding: 0 1.35rem 1.25rem;
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+
+    .faq-item.open .faq-answer {
+      display: block;
+    }
+
+    .faq-ask-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      margin-top: 0.75rem;
+      background: transparent;
+      border: none;
+      color: var(--accent);
+      font-family: inherit;
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+      padding: 0;
+    }
+
+    /* =========================================
+       FOOTER (SHARED STRUCTURE)
+       ========================================= */
+    .footer {
+      background-color: var(--footer-bg);
+      border-top: 1px solid var(--border-light);
+      padding: 4rem 2rem 2rem;
+      color: var(--text-secondary);
+      transition: background-color 0.2s, border-color 0.2s;
+    }
+
+    .footer__container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1.5fr;
+      gap: 3rem;
+    }
+
+    .footer__col h3 {
+      color: var(--text-primary);
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 1.5rem;
+    }
+
+    .footer__brand {
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: var(--text-primary);
+      text-decoration: none;
+      display: inline-block;
+      margin-bottom: 1rem;
+    }
+
+    .footer__brand span { color: var(--accent); }
+
+    .footer__desc {
+      font-size: 0.95rem;
+      line-height: 1.6;
+      margin-bottom: 1.5rem;
+      max-width: 300px;
+    }
+
+    .footer__socials { display: flex; gap: 0.75rem; }
+
+    .footer__socials a {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 2.2rem;
+      height: 2.2rem;
+      border-radius: 50%;
+      background: var(--navbar-bg);
+      color: var(--text-primary);
+      text-decoration: none;
+      border: 1px solid var(--border-light);
+      transition: var(--transition);
+    }
+
+    .footer__socials a:hover {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+      transform: translateY(-2px);
+    }
+
+    .footer__links {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+    }
+
+    .footer__links a {
+      text-decoration: none;
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+      transition: var(--transition);
+    }
+
+    .footer__links a:hover { color: var(--accent); padding-left: 4px; }
+    html[dir="rtl"] .footer__links a:hover { padding-left: 0; padding-right: 4px; }
+
+    .footer__newsletter p {
+      font-size: 0.95rem;
+      line-height: 1.6;
+      margin-bottom: 1rem;
+    }
+
+    .footer__form { display: flex; gap: 0.5rem; }
+
+    .footer__form input {
+      flex: 1;
+      padding: 0.6rem 1rem;
+      border-radius: 0.5rem;
+      border: 1px solid var(--border-light);
+      background: var(--navbar-bg);
+      color: var(--text-primary);
+      font-size: 0.9rem;
+      outline: none;
+      transition: var(--transition);
+    }
+
+    .footer__form input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.2);
+    }
+
+    .footer__form button {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      padding: 0.6rem 1rem;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.9rem;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .footer__form button:hover { background: var(--accent-hover); }
+
+    .footer__bottom {
+      max-width: 1200px;
+      margin: 3rem auto 0;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border-light);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.9rem;
+    }
+
+    .footer__legal { display: flex; gap: 1.5rem; }
+    .footer__legal a { text-decoration: none; color: var(--text-secondary); transition: var(--transition); }
+    .footer__legal a:hover { color: var(--accent); }
+
+    @media screen and (max-width: 992px) {
+      .concierge-hero {
+        padding: 3rem 0 3.5rem;
+      }
+      .channels-grid,
+      .orderpad-grid,
+      .studios-grid,
+      .faq-split {
+        grid-template-columns: 1fr;
+      }
+      .check-presenter {
+        position: static;
+      }
+      .footer__container { grid-template-columns: 1fr 1fr; gap: 2.5rem; }
+      .footer__bottom { flex-direction: column; gap: 1rem; text-align: center; }
+    }
+
+    @media screen and (max-width: 600px) {
+      .sc-container { padding: 0 1.25rem; }
+      .pad-row-2 {
+        grid-template-columns: 1fr;
+      }
+      .pad-card { padding: 1.5rem; }
+      .footer__container { grid-template-columns: 1fr; }
+      .footer__form { flex-direction: column; }
+      .footer__legal { flex-wrap: wrap; justify-content: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <a href="index.html" class="navbar__brand">Scan<span>Dine</span></a>
+    <ul class="navbar__menu">
+      <li class="navbar__item">
+        <a href="#" class="navbar__link">Home <i class="fas fa-chevron-down"></i></a>
+        <ul class="dropdown">
+          <li><a href="index.html">Home1</a></li>
+          <li><a href="home2.html">Home2</a></li>
+        </ul>
+      </li>
+      <li class="navbar__item"><a href="features.html" class="navbar__link">Features</a></li>
+      <li class="navbar__item"><a href="pricing plans.html" class="navbar__link">Pricing Plans</a></li>
+      <li class="navbar__item"><a href="demo request.html" class="navbar__link">Demo Request</a></li>
+      <li class="navbar__item"><a href="contact.html" class="navbar__link is-active" aria-current="page">Contact</a></li>
+      <li class="navbar__item">
+        <a href="#" class="navbar__link">Dashboard <i class="fas fa-chevron-down"></i></a>
+        <ul class="dropdown">
+          <li><a href="user-dashboard.html">User Dashboard</a></li>
+          <li><a href="admin-dashboard.html">Admin Dashboard</a></li>
+        </ul>
+      </li>
+      <li class="navbar__item">
+        <a href="login.html" class="navbar__link navbar__link--login">Login</a>
+      </li>
+    </ul>
+    <div class="navbar__icons">
+      <button class="icon-btn desktop-only" id="themeToggle" aria-label="Toggle dark mode">
+        <i class="fas fa-moon" id="themeIcon"></i>
+      </button>
+      <button class="icon-btn desktop-only" id="rtlToggle" aria-label="Toggle RTL/LTR">
+        <i class="fas fa-arrow-right-arrow-left"></i>
+      </button>
+      <button class="hamburger" id="hamburgerBtn" aria-label="Open menu">
+        <i class="fas fa-bars" id="hamburgerIcon"></i>
+      </button>
+    </div>
+    <div class="mobile-menu" id="mobileMenu">
+      <ul class="mobile-menu__list">
+        <li class="mobile-menu__item">
+          <a href="#" class="mobile-menu__link" data-submenu="homeSub">Home <i class="fas fa-chevron-down"></i></a>
+          <ul class="mobile-submenu" id="homeSub">
+            <li><a href="index.html">Home1</a></li>
+            <li><a href="home2.html">Home2</a></li>
+          </ul>
+        </li>
+        <li class="mobile-menu__item"><a href="features.html" class="mobile-menu__link">Features</a></li>
+        <li class="mobile-menu__item"><a href="pricing plans.html" class="mobile-menu__link">Pricing Plans</a></li>
+        <li class="mobile-menu__item"><a href="demo request.html" class="mobile-menu__link">Demo Request</a></li>
+        <li class="mobile-menu__item"><a href="contact.html" class="mobile-menu__link is-active" aria-current="page">Contact</a></li>
+        <li class="mobile-menu__item">
+          <a href="#" class="mobile-menu__link" data-submenu="dashSub">Dashboard <i class="fas fa-chevron-down"></i></a>
+          <ul class="mobile-submenu" id="dashSub">
+            <li><a href="user-dashboard.html">User Dashboard</a></li>
+            <li><a href="admin-dashboard.html">Admin Dashboard</a></li>
+          </ul>
+        </li>
+        <li class="mobile-menu__item">
+          <a href="login.html" class="mobile-menu__link mobile-menu__link--login">Login</a>
+        </li>
+      </ul>
+      <div class="mobile-preferences">
+        <div class="mobile-pref-item" id="mobileThemeToggle">
+          <button class="icon-btn" aria-label="Toggle dark mode">
+            <i class="fas fa-moon" id="mobileThemeIcon"></i>
+          </button>
+          <span>Dark Mode</span>
+        </div>
+        <div class="mobile-pref-item" id="mobileRtlToggle">
+          <button class="icon-btn" aria-label="Toggle RTL/LTR">
+            <i class="fas fa-arrow-right-arrow-left"></i>
+          </button>
+          <span>RTL / LTR</span>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- MAIN CONTENT -->
+  <main>
+
+    <!-- 1. TABLE-SIDE CONCIERGE FULL-SCREEN HERO -->
+    <section class="concierge-hero">
+      <div class="hero-bg-media" aria-hidden="true">
+        <img src="images/contact-hero-bg.jpg" alt="Modern restaurant interior with guests ordering digitally on tablets and phones at wooden tables" class="hero-bg-img">
+      </div>
+      <div class="hero-bg-overlay" aria-hidden="true"></div>
+
+      <div class="sc-container">
+        <div class="hero-grid">
+          <div class="hero-copy">
+            <span class="sc-badge">
+              <span class="pulse-dot"></span>
+              Table-Side Concierge &bull; Avg Reply 9 Min
+            </span>
+            <h1>Pull up a chair. Our team is already <span>at your table.</span></h1>
+            <p class="hero-lead">
+              Skip generic support queues. Reach our restaurant specialists directly for QR menu onboarding, POS sync, and custom table hardware.
+            </p>
+
+            <div class="hero-actions">
+              <a href="#order-pad" class="btn-primary-cta">
+                <span>Send a Message</span>
+                <i class="fas fa-arrow-down"></i>
+              </a>
+              <a href="#direct-channels" class="btn-ghost-cta">
+                <i class="fas fa-headset"></i>
+                <span>Direct Contact Channels</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. DIRECT HOSPITALITY CHANNELS & INSTANT CALLBACK -->
+    <section class="channels-section" id="direct-channels">
+      <div class="sc-container">
+        <div class="sec-header">
+          <div>
+            <span class="sc-badge"><i class="fas fa-headset"></i> Direct Support Lines</span>
+            <h2>Reach the right hospitality team in one click.</h2>
+          </div>
+          <p>Whether you are launching your first QR menu or syncing multiple restaurant locations, connect directly with the specialist team you need.</p>
+        </div>
+
+        <div class="channels-grid">
+          <article class="channel-card">
+            <div class="channel-media">
+              <img src="images/zone-dining-room.jpg" alt="Modern restaurant dining table ready for digital QR menu service">
+              <span class="channel-sla sc-mono"><span class="pulse-dot"></span> &lt; 2h Menu Build</span>
+            </div>
+            <div class="channel-body">
+              <div class="channel-head">
+                <span class="channel-icon"><i class="fas fa-utensils"></i></span>
+                <h3>Menu &amp; Allergen Onboarding</h3>
+              </div>
+              <p>Send a PDF, spreadsheet, or photo of your menu and our team structures items, modifiers, and allergen filters.</p>
+              <div class="channel-meta">
+                <button type="button" class="channel-copy-row" data-copy-text="menus@scandine.io">
+                  <span>menus@scandine.io</span>
+                  <i class="far fa-copy"></i>
+                </button>
+                <button type="button" class="channel-copy-row" data-copy-text="+1 (512) 555-0184">
+                  <span>+1 (512) 555-0184</span>
+                  <i class="far fa-copy"></i>
+                </button>
+              </div>
+              <button type="button" class="channel-route-btn" data-select-desk="Menu & Allergen Onboarding">
+                <span>Start Menu Request</span>
+                <i class="fas fa-arrow-down"></i>
+              </button>
+            </div>
+          </article>
+
+          <article class="channel-card">
+            <div class="channel-media">
+              <img src="images/zone-bar-pos.jpg" alt="Restaurant bar and POS counter setup">
+              <span class="channel-sla sc-mono"><span class="pulse-dot"></span> &lt; 15m Live Support</span>
+            </div>
+            <div class="channel-body">
+              <div class="channel-head">
+                <span class="channel-icon"><i class="fas fa-print"></i></span>
+                <h3>POS &amp; Printer Support</h3>
+              </div>
+              <p>24/7 assistance for Toast, Square, Clover integration, kitchen display sync, and thermal receipt printers.</p>
+              <div class="channel-meta">
+                <button type="button" class="channel-copy-row" data-copy-text="support@scandine.io">
+                  <span>support@scandine.io</span>
+                  <i class="far fa-copy"></i>
+                </button>
+                <button type="button" class="channel-copy-row" data-copy-text="+1 (800) 555-0142">
+                  <span>+1 (800) 555-0142</span>
+                  <i class="far fa-copy"></i>
+                </button>
+              </div>
+              <button type="button" class="channel-route-btn" data-select-desk="POS & Printer Support">
+                <span>Get Technical Help</span>
+                <i class="fas fa-arrow-down"></i>
+              </button>
+            </div>
+          </article>
+
+          <article class="channel-card">
+            <div class="channel-media">
+              <img src="images/zone-patio.jpg" alt="Outdoor restaurant patio tables with contactless QR dining">
+              <span class="channel-sla sc-mono"><i class="fas fa-qrcode"></i> 48h Sample Proof</span>
+            </div>
+            <div class="channel-body">
+              <div class="channel-head">
+                <span class="channel-icon"><i class="fas fa-store"></i></span>
+                <h3>QR Hardware &amp; Rollouts</h3>
+              </div>
+              <p>Order engraved walnut &amp; brass table stands, waterproof NFC coasters, or plan a multi-location franchise rollout.</p>
+              <div class="channel-meta">
+                <button type="button" class="channel-copy-row" data-copy-text="sales@scandine.io">
+                  <span>sales@scandine.io</span>
+                  <i class="far fa-copy"></i>
+                </button>
+                <button type="button" class="channel-copy-row" data-copy-text="+44 20 7946 0811">
+                  <span>+44 20 7946 0811</span>
+                  <i class="far fa-copy"></i>
+                </button>
+              </div>
+              <button type="button" class="channel-route-btn" data-select-desk="QR Stands & Sample Kit">
+                <span>Request Stands or Rollout</span>
+                <i class="fas fa-arrow-down"></i>
+              </button>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. WAITER'S ORDER-PAD FORM & LIVE CHECK PRESENTER -->
+    <section class="orderpad-section" id="order-pad">
+      <div class="sc-container">
+        <div class="sec-header">
+          <div>
+            <span class="sc-badge"><i class="fas fa-pen-to-square"></i> Waiter's Order-Pad</span>
+            <h2>Send your ticket straight to the pass.</h2>
+          </div>
+          <p>Fill out your venue details on the pad and watch your live Check Presenter update on the right before firing it to our team.</p>
+        </div>
+
+        <div class="orderpad-grid">
+          <div class="pad-card">
+            <div class="pad-header">
+              <h3>Service Request Slip</h3>
+              <span class="sc-mono" id="padDeskPill" style="color: var(--accent); font-size: 0.82rem; font-weight: 700;">MENU ONBOARDING</span>
+            </div>
+
+            <form class="pad-form" id="orderPadForm" novalidate>
+              <div class="pad-row-2">
+                <div class="pad-field" id="padFieldName">
+                  <label for="padName">Your Name *</label>
+                  <input type="text" id="padName" placeholder="e.g. Elena Moretti" required>
+                  <span class="pad-error">Please enter your name.</span>
+                </div>
+                <div class="pad-field" id="padFieldEmail">
+                  <label for="padEmail">Work Email *</label>
+                  <input type="email" id="padEmail" placeholder="elena@trattoriasol.com" required>
+                  <span class="pad-error">Please enter a valid email address.</span>
+                </div>
+              </div>
+
+              <div class="pad-row-2">
+                <div class="pad-field">
+                  <label for="padRestaurant">Restaurant Name</label>
+                  <input type="text" id="padRestaurant" placeholder="e.g. Trattoria Sol">
+                </div>
+                <div class="pad-field">
+                  <label for="padZone">Topic / Desk</label>
+                  <select id="padZone">
+                    <option value="Menu & Allergen Onboarding">Menu &amp; Allergen Onboarding</option>
+                    <option value="POS & Printer Support">POS &amp; Printer Support</option>
+                    <option value="QR Stands & Sample Kit">QR Stands &amp; Sample Kit</option>
+                    <option value="Multi-Venue Rollouts">Multi-Venue Rollouts</option>
+                    <option value="General Inquiry">General Inquiry</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="pad-field" id="padFieldMsg">
+                <label for="padMessage">
+                  <span>Message *</span>
+                  <span class="sc-mono" id="padCharCount" style="font-size: 0.78rem; color: var(--text-secondary);">0 / 800</span>
+                </label>
+                <textarea id="padMessage" maxlength="800" placeholder="Tell us about your menu, POS, or rollout timeline..." required></textarea>
+                <span class="pad-error">Please write at least 10 characters so we can route your request.</span>
+              </div>
+
+              <button type="submit" class="btn-primary-cta" style="justify-content: center;">
+                <span>Send Message</span>
+                <i class="fas fa-paper-plane"></i>
+              </button>
+            </form>
+          </div>
+
+          <!-- LIVE CHECK PRESENTER -->
+          <aside class="check-presenter" aria-live="polite">
+            <div class="presenter-photo">
+              <img src="images/zone-chefs-pass.jpg" alt="Restaurant chefs at the kitchen pass ready to receive digital orders">
+              <span class="presenter-photo-tag sc-mono">LIVE TICKET SUMMARY</span>
+            </div>
+
+            <div class="presenter-body">
+              <div class="presenter-title">
+                <h4>Live Check Summary</h4>
+                <span class="sc-mono" id="stubRefBadge" style="font-size: 0.8rem; color: var(--accent); font-weight: 700;">DRAFT</span>
+              </div>
+
+              <ul class="ticket-rows sc-mono">
+                <li><span>Name</span><strong id="stubName">Pending name</strong></li>
+                <li><span>Restaurant</span><strong id="stubVenue">Unassigned</strong></li>
+                <li><span>Email</span><strong id="stubEmail">Pending email</strong></li>
+                <li><span>Desk</span><strong id="stubZone">Menu &amp; Allergen Onboarding</strong></li>
+              </ul>
+
+              <div class="ticket-preview-note" id="stubNote">
+                Your order-pad message preview appears here as you type...
+              </div>
+
+              <div class="ticket-confirmed-banner" id="stubConfirmed">
+                <strong><i class="fas fa-circle-check"></i> Ticket Dispatched (<span id="stubFinalId">#SD-4821</span>)</strong>
+                <p id="stubFinalText">Your request is queued for our specialist desk. Keep your reference ID handy for instant follow-ups.</p>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. REGIONAL TASTING STUDIOS & LIVE LOCAL CLOCKS -->
+    <section class="studios-section" id="studios">
+      <div class="sc-container">
+        <div class="sec-header">
+          <div>
+            <span class="sc-badge"><i class="fas fa-location-dot"></i> Walk-In Tasting Studios</span>
+            <h2>Test engraved QR hardware in person.</h2>
+          </div>
+          <p>Drop by one of our three hospitality labs to test waterproof NFC coasters, walnut table tents, and thermal kitchen displays over espresso.</p>
+        </div>
+
+        <div class="studios-grid">
+          <article class="studio-card">
+            <div class="studio-media">
+              <img src="images/contact-studio-austin.jpg" alt="Austin cafe storefront and hospitality lab exterior">
+            </div>
+            <div class="studio-top">
+              <span class="zone-code sc-mono">AMER // HQ LAB</span>
+              <span class="studio-clock sc-mono" id="clockAustin">--:--</span>
+            </div>
+            <h3>Austin Hardware Studio</h3>
+            <p>Our flagship laser-engraving workshop and North American POS testing kitchen.</p>
+            <ul class="studio-meta-list">
+              <li><i class="fas fa-map-pin"></i><span>408 Congress Ave, Floor 3, Austin, TX 78701</span></li>
+              <li><i class="fas fa-clock"></i><span>Mon&ndash;Fri, 9:00 AM &ndash; 6:00 PM CST</span></li>
+              <li><i class="fas fa-phone"></i><span>+1 (512) 555-0199</span></li>
+            </ul>
+            <button type="button" class="studio-copy-btn" data-copy="408 Congress Ave, Floor 3, Austin, TX 78701">
+              <i class="far fa-copy"></i> Copy Austin Address
+            </button>
+          </article>
+
+          <article class="studio-card">
+            <div class="studio-media">
+              <img src="images/contact-studio-london.jpg" alt="London Soho Bar Italia illuminated cafe exterior at night">
+            </div>
+            <div class="studio-top">
+              <span class="zone-code sc-mono">EMEA // SOHO</span>
+              <span class="studio-clock sc-mono" id="clockLondon">--:--</span>
+            </div>
+            <h3>London Soho Studio</h3>
+            <p>Menu engineering lounge featuring brushed brass table plaques and European payment demos.</p>
+            <ul class="studio-meta-list">
+              <li><i class="fas fa-map-pin"></i><span>24 Berwick Street, Soho, London W1F 8RG</span></li>
+              <li><i class="fas fa-clock"></i><span>Mon&ndash;Sat, 9:30 AM &ndash; 6:30 PM GMT</span></li>
+              <li><i class="fas fa-phone"></i><span>+44 20 7946 0821</span></li>
+            </ul>
+            <button type="button" class="studio-copy-btn" data-copy="24 Berwick Street, Soho, London W1F 8RG">
+              <i class="far fa-copy"></i> Copy London Address
+            </button>
+          </article>
+
+          <article class="studio-card">
+            <div class="studio-media">
+              <img src="images/contact-studio-dubai.jpg" alt="Dubai Marina waterfront skyline and hospitality promenade at dusk">
+            </div>
+            <div class="studio-top">
+              <span class="zone-code sc-mono">MENA // MARINA</span>
+              <span class="studio-clock sc-mono" id="clockDubai">--:--</span>
+            </div>
+            <h3>Dubai Marina Lounge</h3>
+            <p>Bilingual Arabic/English RTL menu studio and outdoor resort QR durability testing hub.</p>
+            <ul class="studio-meta-list">
+              <li><i class="fas fa-map-pin"></i><span>Marina Plaza, Level 14, Dubai Marina, UAE</span></li>
+              <li><i class="fas fa-clock"></i><span>Sun&ndash;Thu, 10:00 AM &ndash; 7:00 PM GST</span></li>
+              <li><i class="fas fa-phone"></i><span>+971 4 555 0174</span></li>
+            </ul>
+            <button type="button" class="studio-copy-btn" data-copy="Marina Plaza, Level 14, Dubai Marina, UAE">
+              <i class="far fa-copy"></i> Copy Dubai Address
+            </button>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. COMPACT SPLIT HELP CENTER (#contact-faq) -->
+    <section class="faq-section" id="contact-faq">
+      <div class="sc-container">
+        <div class="faq-split">
+          <div class="faq-intro">
+            <span class="sc-badge"><i class="fas fa-circle-question"></i> Help Center</span>
+            <h2>Common questions, answered.</h2>
+            <p>Search or filter below. Need a tailored setup? Click any prompt to pre-fill the contact slip above.</p>
+
+            <div class="faq-search">
+              <i class="fas fa-magnifying-glass"></i>
+              <input type="search" id="faqSearchInput" placeholder="Search POS, menus, QR stands..." aria-label="Search help center questions">
+            </div>
+
+            <div class="faq-cats" role="tablist" aria-label="FAQ categories">
+              <button type="button" class="faq-cat-btn active" data-cat="all">All</button>
+              <button type="button" class="faq-cat-btn" data-cat="setup">Menus</button>
+              <button type="button" class="faq-cat-btn" data-cat="pos">POS</button>
+              <button type="button" class="faq-cat-btn" data-cat="hardware">Hardware</button>
+            </div>
+          </div>
+
+          <div class="faq-accordion" id="faqAccordion">
+            <article class="faq-item open" data-cat="setup">
+              <button type="button" class="faq-trigger">
+                <span>How fast can you digitize our paper or PDF menu?</span>
+                <i class="fas fa-chevron-down"></i>
+              </button>
+              <div class="faq-answer">
+                <p>Send a PDF, spreadsheet, or clear photos and our team delivers a full interactive menu with modifiers and allergen filters within 24 hours.</p>
+                <button type="button" class="faq-ask-btn" data-prefill="We have a PDF/photo menu we would like digitized within 24 hours.">Ask about menu setup &rarr;</button>
+              </div>
+            </article>
+
+            <article class="faq-item" data-cat="pos">
+              <button type="button" class="faq-trigger">
+                <span>Which POS systems and thermal printers are supported?</span>
+                <i class="fas fa-chevron-down"></i>
+              </button>
+              <div class="faq-answer">
+                <p>ScanDine syncs two-way with Toast, Square, Clover, Lightspeed, and Revel, and prints directly to Star Micronics and Epson ESC/POS kitchen printers.</p>
+                <button type="button" class="faq-ask-btn" data-prefill="We want to verify compatibility with our POS and thermal kitchen printers.">Check our POS model &rarr;</button>
+              </div>
+            </article>
+
+            <article class="faq-item" data-cat="hardware">
+              <button type="button" class="faq-trigger">
+                <span>Can we order custom-engraved walnut or brass QR stands?</span>
+                <i class="fas fa-chevron-down"></i>
+              </button>
+              <div class="faq-answer">
+                <p>Yes — share your logo and we send a CAD proof within 48 hours. Stands are laser-serialized per table with optional NFC tap chips.</p>
+                <button type="button" class="faq-ask-btn" data-prefill="We would like a quote and free sample kit for engraved walnut/brass QR table stands.">Request a sample kit &rarr;</button>
+              </div>
+            </article>
+
+            <article class="faq-item" data-cat="setup">
+              <button type="button" class="faq-trigger">
+                <span>Do guests need an app, or do QR codes break on price edits?</span>
+                <i class="fas fa-chevron-down"></i>
+              </button>
+              <div class="faq-answer">
+                <p>No app required — menus load in under 0.5 seconds with Apple Pay and Google Pay built in, and dynamic QR links update prices without reprinting.</p>
+                <button type="button" class="faq-ask-btn" data-prefill="We want a quick walkthrough of dynamic QR menus and contactless table checkout.">Ask about guest checkout &rarr;</button>
+              </div>
+            </article>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer__container">
+      <div class="footer__col">
+        <a href="index.html" class="footer__brand">Scan<span>Dine</span></a>
+        <p class="footer__desc">The ultimate QR code menu and contactless ordering system for modern restaurants. Fast, safe, and seamless.</p>
+        <div class="footer__socials">
+          <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+          <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+          <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+          <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+        </div>
+      </div>
+      <div class="footer__col">
+        <h3>Product</h3>
+        <ul class="footer__links">
+          <li><a href="features.html">Features</a></li>
+          <li><a href="pricing plans.html">Pricing Plans</a></li>
+          <li><a href="demo request.html">Demo Request</a></li>
+          <li><a href="#">Dashboard</a></li>
+        </ul>
+      </div>
+      <div class="footer__col">
+        <h3>Support</h3>
+        <ul class="footer__links">
+          <li><a href="#contact-faq">Help Center</a></li>
+          <li><a href="contact.html">Contact Us</a></li>
+          <li><a href="#">Privacy Policy</a></li>
+          <li><a href="#">Terms of Service</a></li>
+        </ul>
+      </div>
+      <div class="footer__col footer__newsletter">
+        <h3>Stay Updated</h3>
+        <p>Subscribe to our newsletter for the latest updates and features.</p>
+        <form class="footer__form" id="footerNewsletterForm">
+          <input type="email" id="footerNewsletterEmail" placeholder="Email address" required>
+          <button type="submit" aria-label="Subscribe"><i class="fas fa-paper-plane"></i></button>
+        </form>
+      </div>
+    </div>
+    <div class="footer__bottom">
+      <p>&copy; 2026 ScanDine. All rights reserved.</p>
+      <div class="footer__legal">
+        <a href="#">Privacy</a>
+        <a href="#">Terms</a>
+        <a href="#">Cookies</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- INTERACTIONS, THEME, RTL & MOBILE NAV -->
+  <script>
+    (function() {
+      /* ----- 1. THEME, RTL & MOBILE NAVIGATION ----- */
+      const htmlElement = document.documentElement;
+      const desktopThemeToggle = document.getElementById('themeToggle');
+      const desktopRtlToggle = document.getElementById('rtlToggle');
+      const mobileThemeToggle = document.getElementById('mobileThemeToggle');
+      const mobileRtlToggle = document.getElementById('mobileRtlToggle');
+      const themeIcons = [document.getElementById('themeIcon'), document.getElementById('mobileThemeIcon')];
+      const hamburgerBtn = document.getElementById('hamburgerBtn');
+      const hamburgerIcon = document.getElementById('hamburgerIcon');
+      const mobileMenu = document.getElementById('mobileMenu');
+
+      function updateTheme(isDark) {
+        if (isDark) {
+          htmlElement.setAttribute('data-theme', 'dark');
+          themeIcons.forEach(icon => { icon.classList.remove('fa-moon'); icon.classList.add('fa-sun'); });
+          localStorage.setItem('theme', 'dark');
+        } else {
+          htmlElement.removeAttribute('data-theme');
+          themeIcons.forEach(icon => { icon.classList.remove('fa-sun'); icon.classList.add('fa-moon'); });
+          localStorage.setItem('theme', 'light');
+        }
+      }
+
+      if (localStorage.getItem('theme') === 'dark') updateTheme(true);
+      desktopThemeToggle.addEventListener('click', () => updateTheme(htmlElement.getAttribute('data-theme') !== 'dark'));
+      mobileThemeToggle.addEventListener('click', () => updateTheme(htmlElement.getAttribute('data-theme') !== 'dark'));
+
+      function updateDirection(isRtl) {
+        if (isRtl) {
+          htmlElement.setAttribute('dir', 'rtl');
+          localStorage.setItem('dir', 'rtl');
+        } else {
+          htmlElement.setAttribute('dir', 'ltr');
+          localStorage.setItem('dir', 'ltr');
+        }
+      }
+
+      if (localStorage.getItem('dir') === 'rtl') updateDirection(true);
+      desktopRtlToggle.addEventListener('click', () => updateDirection(htmlElement.getAttribute('dir') !== 'rtl'));
+      mobileRtlToggle.addEventListener('click', () => updateDirection(htmlElement.getAttribute('dir') !== 'rtl'));
+
+      const mobileBackdrop = document.createElement('div');
+      mobileBackdrop.className = 'mobile-backdrop';
+      document.body.appendChild(mobileBackdrop);
+      document.body.appendChild(mobileMenu);
+
+      if (!mobileMenu.querySelector('.mobile-drawer-header')) {
+        const drawerHeader = document.createElement('div');
+        drawerHeader.className = 'mobile-drawer-header';
+        drawerHeader.innerHTML = '<a href="index.html" class="navbar__brand">Scan<span>Dine</span></a><button type="button" class="mobile-drawer-close" aria-label="Close menu"><i class="fas fa-times"></i></button>';
+        mobileMenu.prepend(drawerHeader);
+      }
+      const drawerCloseBtn = mobileMenu.querySelector('.mobile-drawer-close');
+
+      function setMobileMenu(open) {
+        if (open) {
+          mobileMenu.classList.add('active');
+          mobileBackdrop.classList.add('active');
+          hamburgerIcon.classList.replace('fa-bars', 'fa-times');
+          document.body.style.overflow = 'hidden';
+        } else {
+          mobileMenu.classList.remove('active');
+          mobileBackdrop.classList.remove('active');
+          hamburgerIcon.classList.replace('fa-times', 'fa-bars');
+          document.body.style.overflow = '';
+        }
+      }
+
+      hamburgerBtn.addEventListener('click', () => setMobileMenu(!mobileMenu.classList.contains('active')));
+      if (drawerCloseBtn) drawerCloseBtn.addEventListener('click', () => setMobileMenu(false));
+      mobileBackdrop.addEventListener('click', () => setMobileMenu(false));
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && mobileMenu.classList.contains('active')) setMobileMenu(false);
+      });
+
+      document.querySelectorAll('.mobile-menu__link[data-submenu]').forEach(link => {
+        link.addEventListener('click', (e) => {
+          e.preventDefault();
+          const targetId = link.getAttribute('data-submenu');
+          const submenu = document.getElementById(targetId);
+          document.querySelectorAll('.mobile-submenu').forEach(sm => {
+            if (sm.id !== targetId) sm.classList.remove('open');
+          });
+          submenu.classList.toggle('open');
+          const chevron = link.querySelector('i');
+          if (chevron) chevron.style.transform = submenu.classList.contains('open') ? 'rotate(180deg)' : 'rotate(0deg)';
+        });
+      });
+
+      window.addEventListener('resize', () => {
+        if (window.innerWidth > 992 && mobileMenu.classList.contains('active')) {
+          setMobileMenu(false);
+        }
+      });
+
+      /* ----- 2. DIRECT CHANNELS COPY BUTTONS ----- */
+      document.querySelectorAll('.channel-copy-row').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const val = btn.dataset.copyText;
+          const labelSpan = btn.querySelector('span');
+          if (!labelSpan || labelSpan.textContent === 'Copied!') return;
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(val).catch(() => {});
+          }
+          labelSpan.textContent = 'Copied!';
+          setTimeout(() => { labelSpan.textContent = val; }, 1200);
+        });
+      });
+
+      /* ----- 3. WAITER'S ORDER-PAD & LIVE CHECK PRESENTER ----- */
+      const padName = document.getElementById('padName');
+      const padRestaurant = document.getElementById('padRestaurant');
+      const padEmail = document.getElementById('padEmail');
+      const padZone = document.getElementById('padZone');
+      const padMessage = document.getElementById('padMessage');
+      const padCharCount = document.getElementById('padCharCount');
+      const padDeskPill = document.getElementById('padDeskPill');
+
+      const stubName = document.getElementById('stubName');
+      const stubVenue = document.getElementById('stubVenue');
+      const stubEmail = document.getElementById('stubEmail');
+      const stubZone = document.getElementById('stubZone');
+      const stubNote = document.getElementById('stubNote');
+      const stubRefBadge = document.getElementById('stubRefBadge');
+      const stubConfirmed = document.getElementById('stubConfirmed');
+      const stubFinalId = document.getElementById('stubFinalId');
+      const stubFinalText = document.getElementById('stubFinalText');
+
+      const deskPillMap = {
+        'Menu & Allergen Onboarding': 'MENU ONBOARDING',
+        'POS & Printer Support': 'POS & PRINTERS',
+        'QR Stands & Sample Kit': 'HARDWARE STUDIO',
+        'Multi-Venue Rollouts': 'ENTERPRISE ROLLOUT',
+        'General Inquiry': 'GENERAL DESK'
+      };
+
+      function syncStub() {
+        stubName.textContent = padName.value.trim() || 'Pending name';
+        stubVenue.textContent = padRestaurant.value.trim() || 'Unassigned';
+        stubEmail.textContent = padEmail.value.trim() || 'Pending email';
+        stubZone.textContent = padZone.value;
+
+        const msg = padMessage.value.trim();
+        stubNote.textContent = msg || 'Your order-pad message preview appears here as you type...';
+        padCharCount.textContent = padMessage.value.length + ' / 800';
+        padDeskPill.textContent = deskPillMap[padZone.value] || 'CONCIERGE DESK';
+      }
+
+      [padName, padRestaurant, padEmail, padZone, padMessage].forEach(el => {
+        el.addEventListener('input', syncStub);
+        el.addEventListener('change', syncStub);
+      });
+
+      document.querySelectorAll('.channel-route-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          padZone.value = btn.dataset.selectDesk;
+          syncStub();
+          document.getElementById('order-pad').scrollIntoView({ behavior: 'smooth' });
+        });
+      });
+
+      document.getElementById('orderPadForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const fName = document.getElementById('padFieldName');
+        const fEmail = document.getElementById('padFieldEmail');
+        const fMsg = document.getElementById('padFieldMsg');
+
+        let valid = true;
+        if (!padName.value.trim()) { fName.classList.add('has-error'); valid = false; } else { fName.classList.remove('has-error'); }
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(padEmail.value.trim())) { fEmail.classList.add('has-error'); valid = false; } else { fEmail.classList.remove('has-error'); }
+        if (padMessage.value.trim().length < 10) { fMsg.classList.add('has-error'); valid = false; } else { fMsg.classList.remove('has-error'); }
+
+        if (!valid) return;
+
+        const ticketId = '#SD-' + Math.floor(1000 + Math.random() * 8999);
+        stubRefBadge.textContent = ticketId;
+        stubFinalId.textContent = ticketId;
+        stubFinalText.textContent = 'Routed to ' + padZone.value + '. Confirmation sent to ' + padEmail.value.trim() + '.';
+        stubConfirmed.classList.add('visible');
+      });
+
+      /* ----- 5. STUDIO LIVE CLOCKS & COPY ADDRESSES ----- */
+      function updateStudioClocks() {
+        const zones = [
+          { id: 'clockAustin', tz: 'America/Chicago' },
+          { id: 'clockLondon', tz: 'Europe/London' },
+          { id: 'clockDubai', tz: 'Asia/Dubai' }
+        ];
+        const now = new Date();
+        zones.forEach(z => {
+          const el = document.getElementById(z.id);
+          if (!el) return;
+          el.textContent = new Intl.DateTimeFormat('en-US', {
+            timeZone: z.tz,
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: false
+          }).format(now);
+        });
+      }
+      updateStudioClocks();
+      setInterval(updateStudioClocks, 30000);
+
+      document.querySelectorAll('.studio-copy-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const addr = btn.dataset.copy;
+          const origHtml = btn.innerHTML;
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(addr).catch(() => {});
+          }
+          btn.innerHTML = '<i class="fas fa-check"></i> Address Copied!';
+          setTimeout(() => { btn.innerHTML = origHtml; }, 1400);
+        });
+      });
+
+      /* ----- 6. SEARCHABLE FAQ & PREFILL TO ORDER-PAD ----- */
+      let activeFaqCat = 'all';
+      const faqSearchInput = document.getElementById('faqSearchInput');
+      const faqItems = document.querySelectorAll('.faq-item');
+
+      function filterFaq() {
+        const q = (faqSearchInput.value || '').trim().toLowerCase();
+        faqItems.forEach(item => {
+          const catMatch = activeFaqCat === 'all' || item.dataset.cat === activeFaqCat;
+          const textMatch = !q || item.textContent.toLowerCase().includes(q);
+          item.classList.toggle('is-hidden', !(catMatch && textMatch));
+        });
+      }
+
+      document.querySelectorAll('.faq-cat-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.faq-cat-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          activeFaqCat = btn.dataset.cat;
+          filterFaq();
+        });
+      });
+
+      faqSearchInput.addEventListener('input', filterFaq);
+
+      document.querySelectorAll('.faq-trigger').forEach(btn => {
+        btn.addEventListener('click', () => {
+          btn.parentElement.classList.toggle('open');
+        });
+      });
+
+      document.querySelectorAll('.faq-ask-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          padMessage.value = btn.dataset.prefill;
+          syncStub();
+          document.getElementById('order-pad').scrollIntoView({ behavior: 'smooth' });
+          padMessage.focus();
+        });
+      });
+
+      /* ----- 7. FOOTER NEWSLETTER INLINE FEEDBACK ----- */
+      const footerForm = document.getElementById('footerNewsletterForm');
+      if (footerForm) {
+        footerForm.addEventListener('submit', (e) => {
+          e.preventDefault();
+          const emailInput = document.getElementById('footerNewsletterEmail');
+          const btn = footerForm.querySelector('button');
+          if (!emailInput.value.trim()) return;
+          btn.innerHTML = '<i class="fas fa-check"></i>';
+          emailInput.value = '';
+          emailInput.placeholder = 'Subscribed!';
+          setTimeout(() => {
+            btn.innerHTML = '<i class="fas fa-paper-plane"></i>';
+            emailInput.placeholder = 'Email address';
+          }, 2200);
+        });
+      }
+
+      syncStub();
+    })();
+  </script>
+</body>
+</html>

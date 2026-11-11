@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ScanDine – Responsive Navbar & Footer</title>
+  <link rel="icon" type="image/svg+xml" href="images/favicon.svg">
+  <link rel="icon" type="image/png" href="images/favicon.png">
+  <link rel="shortcut icon" href="favicon.ico">
+  <link rel="apple-touch-icon" href="images/favicon.png">
+  <!-- Font Awesome 6 (free) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    /* ----- GLOBAL RESET & VARIABLES ----- */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --navbar-bg: #ffffff;
+      --footer-bg: #f8fafc;
+      --navbar-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+      --text-primary: #1e1e2f;
+      --text-secondary: #4a4a6a;
+      --accent: #f97316;
+      --accent-hover: #ea580c;
+      --dropdown-bg: #ffffff;
+      --dropdown-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+      --border-light: #e9e9f0;
+      --icon-color: #4a4a6a;
+      --transition: all 0.2s ease;
+    }
+
+    /* DARK MODE VARIABLES */
+    html[data-theme="dark"] {
+      --navbar-bg: #12121c;
+      --footer-bg: #0f0f16;
+      --navbar-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+      --text-primary: #f0f0f5;
+      --text-secondary: #b0b0c0;
+      --accent: #fb923c;
+      --accent-hover: #f97316;
+      --dropdown-bg: #1e1e2c;
+      --dropdown-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.6);
+      --border-light: #2a2a3a;
+      --icon-color: #c0c0d0;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+      background-color: #f8fafc;
+      color: var(--text-primary);
+      transition: background-color 0.2s, color 0.2s;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    html[data-theme="dark"] body { background-color: #0b0b12; }
+
+    /* Push footer to bottom */
+    main { flex: 1; }
+
+    /* ----- NAVBAR CONTAINER ----- */
+    .navbar {
+      background: var(--navbar-bg);
+      box-shadow: var(--navbar-shadow);
+      padding: 0.75rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      transition: background 0.2s, box-shadow 0.2s;
+      flex-wrap: wrap;
+    }
+
+    .navbar__brand {
+      font-size: 1.6rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: var(--text-primary);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+    }
+
+    .navbar__brand span { color: var(--accent); }
+
+    /* ----- DESKTOP MENU ----- */
+    .navbar__menu {
+      display: flex;
+      align-items: center;
+      list-style: none;
+      gap: 1.75rem;
+      margin: 0;
+      padding: 0;
+    }
+
+    .navbar__item {
+      position: relative;
+      display: flex;
+      align-items: center;
+      height: 100%;
+    }
+
+    .navbar__link {
+      text-decoration: none;
+      color: var(--text-primary);
+      font-weight: 500;
+      font-size: 0.95rem;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      padding: 0.5rem 0;
+      transition: var(--transition);
+      border-bottom: 2px solid transparent;
+    }
+
+    .navbar__link:hover,
+    .navbar__link.is-active {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+    }
+
+    .navbar__link i {
+      font-size: 0.7rem;
+      color: var(--text-secondary);
+      transition: transform 0.2s;
+    }
+
+    .navbar__link.is-active i { color: var(--accent); }
+
+    .navbar__item:hover .navbar__link i { transform: rotate(180deg); }
+
+    /* LOGIN BUTTON STYLING */
+    .navbar__link--login {
+      background-color: var(--accent);
+      color: #ffffff !important;
+      padding: 0.5rem 1.25rem !important;
+      border-radius: 0.5rem;
+      border-bottom: none !important;
+      font-weight: 600;
+      transition: var(--transition);
+    }
+
+    .navbar__link--login:hover {
+      background-color: var(--accent-hover);
+      color: #ffffff !important;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);
+    }
+
+    /* ----- DROPDOWN ----- */
+    .dropdown {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      min-width: 200px;
+      background: var(--dropdown-bg);
+      border-radius: 0.75rem;
+      box-shadow: var(--dropdown-shadow);
+      padding: 0.5rem 0;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(8px);
+      transition: all 0.2s ease;
+      border: 1px solid var(--border-light);
+      z-index: 100;
+      list-style: none;
+    }
+
+    .navbar__item:hover .dropdown {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+
+    .dropdown li a {
+      display: block;
+      padding: 0.5rem 1.25rem;
+      text-decoration: none;
+      color: var(--text-primary);
+      font-size: 0.9rem;
+      transition: background 0.15s;
+    }
+
+    .dropdown li a:hover,
+    .dropdown li a.is-active { background: var(--border-light); color: var(--accent); font-weight: 600; }
+
+    /* ----- ICONS GROUP ----- */
+    .navbar__icons {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .icon-btn {
+      background: transparent;
+      border: none;
+      font-size: 1.15rem;
+      color: var(--icon-color);
+      cursor: pointer;
+      padding: 0.4rem;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: var(--transition);
+      width: 2.2rem;
+      height: 2.2rem;
+    }
+
+    .icon-btn:hover { background: var(--border-light); color: var(--accent); }
+
+    .hamburger {
+      display: none;
+      background: transparent;
+      border: none;
+      font-size: 1.5rem;
+      color: var(--text-primary);
+      cursor: pointer;
+      padding: 0.4rem;
+      border-radius: 0.5rem;
+      transition: var(--transition);
+    }
+
+    .hamburger:hover { background: var(--border-light); }
+
+    /* ----- MOBILE MENU ----- */
+    .mobile-menu {
+      display: none;
+      width: 100%;
+      background: var(--navbar-bg);
+      padding: 1rem 0;
+      border-top: 1px solid var(--border-light);
+      transition: all 0.25s ease;
+    }
+
+    .mobile-menu.active { display: block; }
+
+    .mobile-menu__list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+      padding: 0 1rem;
+    }
+
+    .mobile-menu__link {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.75rem 1rem;
+      text-decoration: none;
+      color: var(--text-primary);
+      font-weight: 500;
+      border-radius: 0.5rem;
+      transition: background 0.15s;
+    }
+
+    .mobile-menu__link:hover,
+    .mobile-menu__link.is-active { background: var(--border-light); color: var(--accent); }
+    .mobile-menu__link i { font-size: 0.75rem; transition: transform 0.2s; }
+
+    .mobile-menu__link--login {
+      background-color: var(--accent);
+      color: #ffffff !important;
+      justify-content: center;
+      margin: 0.5rem 1rem;
+      padding: 0.8rem;
+      font-weight: 600;
+    }
+
+    .mobile-menu__link--login:hover {
+      background-color: var(--accent-hover);
+      color: #ffffff !important;
+    }
+
+    .mobile-submenu {
+      list-style: none;
+      padding-left: 1.5rem;
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.25s ease;
+    }
+
+    .mobile-submenu.open { max-height: 300px; }
+
+    .mobile-submenu li a {
+      display: block;
+      padding: 0.5rem 1rem;
+      text-decoration: none;
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      border-radius: 0.4rem;
+    }
+
+    .mobile-submenu li a:hover,
+    .mobile-submenu li a.is-active { background: var(--border-light); color: var(--accent); font-weight: 600; }
+
+    /* ----- MOBILE PREFERENCES SECTION ----- */
+    .mobile-preferences {
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 1.5rem;
+      padding: 1rem 2rem;
+      margin-top: 0.5rem;
+      border-top: 1px solid var(--border-light);
+    }
+
+    .mobile-pref-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    .mobile-pref-item .icon-btn { width: 2rem; height: 2rem; font-size: 1.1rem; }
+
+    /* ----- RTL OVERRIDES ----- */
+    html[dir="rtl"] .dropdown { left: auto; right: 0; }
+    html[dir="rtl"] .mobile-submenu { padding-left: 0; padding-right: 1.5rem; }
+    html[dir="rtl"] .mobile-preferences { flex-direction: row-reverse; justify-content: flex-end; }
+
+    /* ----- RESPONSIVE BREAKPOINT ----- */
+    @media screen and (max-width: 992px) {
+      .navbar { padding: 0.75rem 1.25rem; }
+      .navbar__menu { display: none; }
+      .navbar__icons .desktop-only { display: none; }
+      .hamburger { display: flex; }
+      .mobile-menu {
+        display: flex;
+        flex-direction: column;
+        position: fixed;
+        top: 0;
+        right: 0;
+        left: auto;
+        width: min(320px, 85vw);
+        height: 100vh;
+        height: 100dvh;
+        padding: 1.25rem 0 2rem;
+        border-top: none;
+        border-left: 1px solid var(--border-light);
+        box-shadow: -12px 0 36px rgba(0, 0, 0, 0.25);
+        z-index: 1200;
+        overflow-y: auto;
+        transform: translateX(100%);
+        visibility: hidden;
+        transition: transform 0.28s ease, visibility 0.28s ease;
+      }
+      .mobile-menu.active {
+        display: flex;
+        transform: translateX(0);
+        visibility: visible;
+      }
+      .mobile-drawer-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 1.25rem 1rem;
+        margin-bottom: 0.75rem;
+        border-bottom: 1px solid var(--border-light);
+      }
+      .mobile-drawer-close {
+        background: transparent;
+        border: none;
+        font-size: 1.35rem;
+        color: var(--text-primary);
+        cursor: pointer;
+        padding: 0.35rem 0.55rem;
+        border-radius: 0.5rem;
+        transition: var(--transition);
+      }
+      .mobile-drawer-close:hover { background: var(--border-light); color: var(--accent); }
+      .mobile-backdrop {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(10, 10, 18, 0.55);
+        backdrop-filter: blur(2px);
+        z-index: 1150;
+      }
+      .mobile-backdrop.active { display: block; }
+    }
+
+    /* =========================================
+       FOOTER SECTION
+       ========================================= */
+    .footer {
+      background-color: var(--footer-bg);
+      border-top: 1px solid var(--border-light);
+      padding: 4rem 2rem 2rem;
+      margin-top: 4rem;
+      color: var(--text-secondary);
+      transition: background-color 0.2s, border-color 0.2s;
+    }
+
+    .footer__container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1.5fr;
+      gap: 3rem;
+    }
+
+    .footer__col h3 {
+      color: var(--text-primary);
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 1.5rem;
+    }
+
+    /* Brand Column */
+    .footer__brand {
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: var(--text-primary);
+      text-decoration: none;
+      display: inline-block;
+      margin-bottom: 1rem;
+    }
+
+    .footer__brand span { color: var(--accent); }
+
+    .footer__desc {
+      font-size: 0.95rem;
+      line-height: 1.6;
+      margin-bottom: 1.5rem;
+      max-width: 300px;
+    }
+
+    .footer__socials {
+      display: flex;
+      gap: 0.75rem;
+    }
+
+    .footer__socials a {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 2.2rem;
+      height: 2.2rem;
+      border-radius: 50%;
+      background: var(--navbar-bg);
+      color: var(--text-primary);
+      text-decoration: none;
+      border: 1px solid var(--border-light);
+      transition: var(--transition);
+    }
+
+    .footer__socials a:hover {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+      transform: translateY(-2px);
+    }
+
+    /* Links Column */
+    .footer__links {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+    }
+
+    .footer__links a {
+      text-decoration: none;
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+      transition: var(--transition);
+    }
+
+    .footer__links a:hover {
+      color: var(--accent);
+      padding-left: 4px;
+    }
+
+    html[dir="rtl"] .footer__links a:hover {
+      padding-left: 0;
+      padding-right: 4px;
+    }
+
+    /* Newsletter Column */
+    .footer__newsletter p {
+      font-size: 0.95rem;
+      line-height: 1.6;
+      margin-bottom: 1rem;
+    }
+
+    .footer__form {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .footer__form input {
+      flex: 1;
+      padding: 0.6rem 1rem;
+      border-radius: 0.5rem;
+      border: 1px solid var(--border-light);
+      background: var(--navbar-bg);
+      color: var(--text-primary);
+      font-size: 0.9rem;
+      outline: none;
+      transition: var(--transition);
+    }
+
+    .footer__form input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.2);
+    }
+
+    .footer__form button {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      padding: 0.6rem 1rem;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.9rem;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .footer__form button:hover {
+      background: var(--accent-hover);
+    }
+
+    /* Footer Bottom */
+    .footer__bottom {
+      max-width: 1200px;
+      margin: 3rem auto 0;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border-light);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.9rem;
+    }
+
+    .footer__legal {
+      display: flex;
+      gap: 1.5rem;
+    }
+
+    .footer__legal a {
+      text-decoration: none;
+      color: var(--text-secondary);
+      transition: var(--transition);
+    }
+
+    .footer__legal a:hover { color: var(--accent); }
+
+    /* Footer Responsive */
+    @media screen and (max-width: 992px) {
+      .footer__container {
+        grid-template-columns: 1fr 1fr;
+        gap: 2.5rem;
+      }
+      .footer__bottom {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+      }
+    }
+
+    @media screen and (max-width: 600px) {
+      .footer__container {
+        grid-template-columns: 1fr;
+      }
+      .footer__form {
+        flex-direction: column;
+      }
+      .footer__legal {
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ========== NAVBAR ========== -->
+  <nav class="navbar">
+    <a href="index.html" class="navbar__brand">Scan<span>Dine</span></a>
+    <ul class="navbar__menu">
+      <li class="navbar__item">
+        <a href="#" class="navbar__link">Home <i class="fas fa-chevron-down"></i></a>
+        <ul class="dropdown">
+          <li><a href="index.html">Home1</a></li>
+          <li><a href="home2.html">Home2</a></li>
+        </ul>
+      </li>
+      <li class="navbar__item"><a href="features.html" class="navbar__link">Features</a></li>
+      <li class="navbar__item"><a href="pricing plans.html" class="navbar__link">Pricing Plans</a></li>
+      <li class="navbar__item"><a href="demo request.html" class="navbar__link">Demo Request</a></li>
+      <li class="navbar__item"><a href="contact.html" class="navbar__link">Contact</a></li>
+      <li class="navbar__item">
+        <a href="#" class="navbar__link">Dashboard <i class="fas fa-chevron-down"></i></a>
+        <ul class="dropdown">
+          <li><a href="user-dashboard.html">User Dashboard</a></li>
+          <li><a href="admin-dashboard.html">Admin Dashboard</a></li>
+        </ul>
+      </li>
+      <li class="navbar__item">
+        <a href="login.html" class="navbar__link navbar__link--login">Login</a>
+      </li>
+    </ul>
+    <div class="navbar__icons">
+      <button class="icon-btn desktop-only" id="themeToggle" aria-label="Toggle dark mode">
+        <i class="fas fa-moon" id="themeIcon"></i>
+      </button>
+      <button class="icon-btn desktop-only" id="rtlToggle" aria-label="Toggle RTL/LTR">
+        <i class="fas fa-arrow-right-arrow-left"></i>
+      </button>
+      <button class="hamburger" id="hamburgerBtn" aria-label="Open menu">
+        <i class="fas fa-bars" id="hamburgerIcon"></i>
+      </button>
+    </div>
+    <div class="mobile-menu" id="mobileMenu">
+      <ul class="mobile-menu__list">
+        <li class="mobile-menu__item">
+          <a href="#" class="mobile-menu__link" data-submenu="homeSub">
+            Home <i class="fas fa-chevron-down"></i>
+          </a>
+          <ul class="mobile-submenu" id="homeSub">
+            <li><a href="index.html">Home1</a></li>
+            <li><a href="home2.html">Home2</a></li>
+          </ul>
+        </li>
+        <li class="mobile-menu__item"><a href="features.html" class="mobile-menu__link">Features</a></li>
+        <li class="mobile-menu__item"><a href="pricing plans.html" class="mobile-menu__link">Pricing Plans</a></li>
+        <li class="mobile-menu__item"><a href="demo request.html" class="mobile-menu__link">Demo Request</a></li>
+        <li class="mobile-menu__item"><a href="contact.html" class="mobile-menu__link">Contact</a></li>
+        <li class="mobile-menu__item">
+          <a href="#" class="mobile-menu__link" data-submenu="dashSub">
+            Dashboard <i class="fas fa-chevron-down"></i>
+          </a>
+          <ul class="mobile-submenu" id="dashSub">
+            <li><a href="user-dashboard.html">User Dashboard</a></li>
+            <li><a href="admin-dashboard.html">Admin Dashboard</a></li>
+          </ul>
+        </li>
+        <li class="mobile-menu__item">
+          <a href="login.html" class="mobile-menu__link mobile-menu__link--login">Login</a>
+        </li>
+      </ul>
+      <div class="mobile-preferences">
+        <div class="mobile-pref-item" id="mobileThemeToggle">
+          <button class="icon-btn" aria-label="Toggle dark mode">
+            <i class="fas fa-moon" id="mobileThemeIcon"></i>
+          </button>
+          <span>Dark Mode</span>
+        </div>
+        <div class="mobile-pref-item" id="mobileRtlToggle">
+          <button class="icon-btn" aria-label="Toggle RTL/LTR">
+            <i class="fas fa-arrow-right-arrow-left"></i>
+          </button>
+          <span>RTL / LTR</span>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content Space -->
+  <main>
+    <div style="max-width: 1100px; margin: 4rem auto; padding: 2rem; text-align: center; background: var(--navbar-bg); border-radius: 2rem; box-shadow: var(--navbar-shadow);">
+      <h1>ScanDine</h1>
+      <p style="color: var(--text-secondary); margin-top: 1rem;">Scroll down to see the new footer section.</p>
+    </div>
+  </main>
+
+  <!-- ========== FOOTER SECTION ========== -->
+  <footer class="footer">
+    <div class="footer__container">
+      
+      <!-- Brand & Desc -->
+      <div class="footer__col">
+        <a href="#" class="footer__brand">Scan<span>Dine</span></a>
+        <p class="footer__desc">
+          The ultimate QR code menu and contactless ordering system for modern restaurants. Fast, safe, and seamless.
+        </p>
+        <div class="footer__socials">
+          <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+          <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+          <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+          <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+        </div>
+      </div>
+
+      <!-- Quick Links -->
+      <div class="footer__col">
+        <h3>Product</h3>
+        <ul class="footer__links">
+          <li><a href="#">Features</a></li>
+          <li><a href="#">Pricing Plans</a></li>
+          <li><a href="#">Demo Request</a></li>
+          <li><a href="#">Dashboard</a></li>
+        </ul>
+      </div>
+
+      <!-- Support -->
+      <div class="footer__col">
+        <h3>Support</h3>
+        <ul class="footer__links">
+          <li><a href="#">Help Center</a></li>
+          <li><a href="contact.html">Contact Us</a></li>
+          <li><a href="#">Privacy Policy</a></li>
+          <li><a href="#">Terms of Service</a></li>
+        </ul>
+      </div>
+
+      <!-- Newsletter -->
+      <div class="footer__col footer__newsletter">
+        <h3>Stay Updated</h3>
+        <p>Subscribe to our newsletter for the latest updates and features.</p>
+        <form class="footer__form" onsubmit="event.preventDefault(); alert('Subscribed!');">
+          <input type="email" placeholder="Email address" required>
+          <button type="submit" aria-label="Subscribe">
+            <i class="fas fa-paper-plane"></i>
+          </button>
+        </form>
+      </div>
+
+    </div>
+
+    <!-- Footer Bottom -->
+    <div class="footer__bottom">
+      <p>&copy; 2023 ScanDine. All rights reserved.</p>
+      <div class="footer__legal">
+        <a href="#">Privacy</a>
+        <a href="#">Terms</a>
+        <a href="#">Cookies</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ========== JAVASCRIPT ========== -->
+  <script>
+    (function() {
+      const htmlElement = document.documentElement;
+
+      // Elements
+      const desktopThemeToggle = document.getElementById('themeToggle');
+      const desktopRtlToggle = document.getElementById('rtlToggle');
+      const mobileThemeToggle = document.getElementById('mobileThemeToggle');
+      const mobileRtlToggle = document.getElementById('mobileRtlToggle');
+      
+      const themeIcons = [document.getElementById('themeIcon'), document.getElementById('mobileThemeIcon')];
+      
+      const hamburgerBtn = document.getElementById('hamburgerBtn');
+      const hamburgerIcon = document.getElementById('hamburgerIcon');
+      const mobileMenu = document.getElementById('mobileMenu');
+
+      // --- 1. THEME TOGGLE LOGIC ---
+      function updateTheme(isDark) {
+        if (isDark) {
+          htmlElement.setAttribute('data-theme', 'dark');
+          themeIcons.forEach(icon => {
+            icon.classList.remove('fa-moon');
+            icon.classList.add('fa-sun');
+          });
+          localStorage.setItem('theme', 'dark');
+        } else {
+          htmlElement.removeAttribute('data-theme');
+          themeIcons.forEach(icon => {
+            icon.classList.remove('fa-sun');
+            icon.classList.add('fa-moon');
+          });
+          localStorage.setItem('theme', 'light');
+        }
+      }
+
+      if (localStorage.getItem('theme') === 'dark') updateTheme(true);
+
+      desktopThemeToggle.addEventListener('click', () => updateTheme(htmlElement.getAttribute('data-theme') !== 'dark'));
+      mobileThemeToggle.addEventListener('click', () => updateTheme(htmlElement.getAttribute('data-theme') !== 'dark'));
+
+      // --- 2. RTL / LTR TOGGLE LOGIC ---
+      function updateDirection(isRtl) {
+        if (isRtl) {
+          htmlElement.setAttribute('dir', 'rtl');
+          localStorage.setItem('dir', 'rtl');
+        } else {
+          htmlElement.setAttribute('dir', 'ltr');
+          localStorage.setItem('dir', 'ltr');
+        }
+      }
+
+      if (localStorage.getItem('dir') === 'rtl') updateDirection(true);
+
+      desktopRtlToggle.addEventListener('click', () => updateDirection(htmlElement.getAttribute('dir') !== 'rtl'));
+      mobileRtlToggle.addEventListener('click', () => updateDirection(htmlElement.getAttribute('dir') !== 'rtl'));
+
+      const mobileBackdrop = document.createElement('div');
+      mobileBackdrop.className = 'mobile-backdrop';
+      document.body.appendChild(mobileBackdrop);
+      document.body.appendChild(mobileMenu);
+
+      if (!mobileMenu.querySelector('.mobile-drawer-header')) {
+        const drawerHeader = document.createElement('div');
+        drawerHeader.className = 'mobile-drawer-header';
+        drawerHeader.innerHTML = '<a href="index.html" class="navbar__brand">Scan<span>Dine</span></a><button type="button" class="mobile-drawer-close" aria-label="Close menu"><i class="fas fa-times"></i></button>';
+        mobileMenu.prepend(drawerHeader);
+      }
+      const drawerCloseBtn = mobileMenu.querySelector('.mobile-drawer-close');
+
+      function setMobileMenu(open) {
+        if (open) {
+          mobileMenu.classList.add('active');
+          mobileBackdrop.classList.add('active');
+          hamburgerIcon.classList.replace('fa-bars', 'fa-times');
+          document.body.style.overflow = 'hidden';
+        } else {
+          mobileMenu.classList.remove('active');
+          mobileBackdrop.classList.remove('active');
+          hamburgerIcon.classList.replace('fa-times', 'fa-bars');
+          document.body.style.overflow = '';
+        }
+      }
+
+      hamburgerBtn.addEventListener('click', () => setMobileMenu(!mobileMenu.classList.contains('active')));
+      if (drawerCloseBtn) drawerCloseBtn.addEventListener('click', () => setMobileMenu(false));
+      mobileBackdrop.addEventListener('click', () => setMobileMenu(false));
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && mobileMenu.classList.contains('active')) setMobileMenu(false);
+      });
+
+      // --- 4. MOBILE SUBMENU TOGGLE ---
+      const mobileSubLinks = document.querySelectorAll('.mobile-menu__link[data-submenu]');
+      mobileSubLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
+          e.preventDefault();
+          const targetId = link.getAttribute('data-submenu');
+          const submenu = document.getElementById(targetId);
+          
+          document.querySelectorAll('.mobile-submenu').forEach(sm => {
+            if (sm.id !== targetId) sm.classList.remove('open');
+          });
+
+          submenu.classList.toggle('open');
+          const chevron = link.querySelector('i');
+          if (chevron) {
+            chevron.style.transform = submenu.classList.contains('open') ? 'rotate(180deg)' : 'rotate(0deg)';
+          }
+        });
+      });
+
+      // Close mobile menu on resize to desktop
+      window.addEventListener('resize', () => {
+        if (window.innerWidth > 992 && mobileMenu.classList.contains('active')) {
+          setMobileMenu(false);
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

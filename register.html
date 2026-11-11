@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ScanDine | Register</title>
+  <link rel="icon" type="image/svg+xml" href="images/favicon.svg">
+  <link rel="icon" type="image/png" href="images/favicon.png">
+  <link rel="shortcut icon" href="favicon.ico">
+  <link rel="apple-touch-icon" href="images/favicon.png">
+  <!-- Font Awesome 6 (free) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+  <style>
+    /* ----- GLOBAL RESET & SCANDINE THEME TOKENS ----- */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg-page: #f8fafc;
+      --surface-color: #ffffff;
+      --surface-alt: #f1f5f9;
+      --text-primary: #1e1e2f;
+      --text-secondary: #525270;
+      --accent: #f97316;
+      --accent-hover: #ea580c;
+      --accent-soft: rgba(249, 115, 22, 0.12);
+      --border-light: #e5e7ef;
+      --success: #10b981;
+      --success-soft: rgba(16, 185, 129, 0.14);
+      --danger: #ef4444;
+      --shadow-lg: 0 24px 60px -18px rgba(15, 23, 42, 0.16);
+      --transition: all 0.2s ease;
+    }
+
+    html[data-theme="dark"] {
+      --bg-page: #0b0b12;
+      --surface-color: #151521;
+      --surface-alt: #10101a;
+      --text-primary: #f0f0f5;
+      --text-secondary: #a4a4bc;
+      --accent: #fb923c;
+      --accent-hover: #f97316;
+      --accent-soft: rgba(251, 146, 60, 0.16);
+      --border-light: #262638;
+      --shadow-lg: 0 24px 60px -18px rgba(0, 0, 0, 0.65);
+    }
+
+    body {
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+      background-color: var(--bg-page);
+      color: var(--text-primary);
+      transition: background-color 0.25s, color 0.25s;
+      height: 100vh;
+      height: 100dvh;
+      overflow: hidden;
+    }
+
+    /* =========================================
+       CENTERED STICKY REGISTER LAYOUT (NO NAVBAR / FOOTER)
+       ========================================= */
+    .auth-shell {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .auth-panel {
+      flex: 1;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.75rem;
+      padding: 1rem 1.5rem;
+      background:
+        radial-gradient(circle at 80% 15%, rgba(249, 115, 22, 0.08), transparent 45%),
+        radial-gradient(circle at 20% 85%, rgba(16, 185, 129, 0.05), transparent 45%),
+        var(--bg-page);
+    }
+
+    .panel-topbar {
+      position: fixed;
+      top: 1.15rem;
+      right: 1.4rem;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+    }
+
+    html[dir="rtl"] .panel-topbar {
+      right: auto;
+      left: 1.4rem;
+    }
+
+    .panel-utils {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .util-btn {
+      width: 2.25rem;
+      height: 2.25rem;
+      border-radius: 0.7rem;
+      border: 1px solid var(--border-light);
+      background: var(--surface-color);
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .util-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .auth-card {
+      width: 100%;
+      max-width: 440px;
+      margin: 0 auto;
+      background: var(--surface-color);
+      border: 1px solid var(--border-light);
+      border-radius: 1.4rem;
+      padding: 1.45rem 1.8rem;
+      box-shadow: var(--shadow-lg);
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      font-size: 1.45rem;
+      font-weight: 800;
+      letter-spacing: -0.025em;
+      color: var(--text-primary);
+      text-decoration: none;
+      margin-bottom: 0.4rem;
+      line-height: 1;
+    }
+
+    .brand span { color: var(--accent); }
+
+    .auth-card h1 {
+      font-size: 1.42rem;
+      font-weight: 800;
+      letter-spacing: -0.025em;
+      margin-bottom: 0.2rem;
+    }
+
+    .auth-subtitle {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      margin-bottom: 0.9rem;
+    }
+
+    /* ROLE SWITCHER */
+    .role-tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.45rem;
+      padding: 0.28rem;
+      border-radius: 0.85rem;
+      background: var(--surface-alt);
+      border: 1px solid var(--border-light);
+      margin-bottom: 0.9rem;
+    }
+
+    .role-tab {
+      padding: 0.5rem 0.7rem;
+      border-radius: 0.62rem;
+      border: none;
+      background: transparent;
+      color: var(--text-secondary);
+      font-family: inherit;
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+      transition: var(--transition);
+    }
+
+    .role-tab.active {
+      background: var(--accent);
+      color: #ffffff;
+      box-shadow: 0 6px 16px -6px rgba(249, 115, 22, 0.55);
+    }
+
+    .auth-form {
+      display: flex;
+      flex-direction: column;
+      gap: 0.72rem;
+    }
+
+    .field-row-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.65rem;
+    }
+
+    .field-row-2.single-col {
+      grid-template-columns: 1fr;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.28rem;
+    }
+
+    .field.is-hidden { display: none; }
+
+    .field label {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .input-wrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .input-wrap input {
+      width: 100%;
+      padding: 0.64rem 0.88rem;
+      border-radius: 0.75rem;
+      border: 1px solid var(--border-light);
+      background: var(--surface-alt);
+      color: var(--text-primary);
+      font-family: inherit;
+      font-size: 0.88rem;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .input-wrap input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.16);
+    }
+
+    .pwd-toggle {
+      position: absolute;
+      right: 0.8rem;
+      background: transparent;
+      border: none;
+      color: var(--text-secondary);
+      cursor: pointer;
+      font-size: 0.92rem;
+    }
+
+    html[dir="rtl"] .pwd-toggle { right: auto; left: 0.8rem; }
+
+    .field-error {
+      font-size: 0.74rem;
+      color: var(--danger);
+      display: none;
+    }
+
+    .field.has-error input { border-color: var(--danger); }
+    .field.has-error .field-error { display: block; }
+
+    .terms-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      cursor: pointer;
+    }
+
+    .terms-label input { accent-color: var(--accent); }
+
+    .submit-btn {
+      width: 100%;
+      padding: 0.74rem 1rem;
+      border-radius: 0.8rem;
+      border: none;
+      background: var(--accent);
+      color: #ffffff;
+      font-family: inherit;
+      font-size: 0.9rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: var(--transition);
+      margin-top: 0.05rem;
+    }
+
+    .submit-btn:hover {
+      background: var(--accent-hover);
+      transform: translateY(-1px);
+    }
+
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      color: var(--text-secondary);
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin: 0.78rem 0;
+    }
+
+    .divider::before,
+    .divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border-light);
+    }
+
+    .social-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.6rem;
+    }
+
+    .social-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.55rem 0.85rem;
+      border-radius: 0.75rem;
+      border: 1px solid var(--border-light);
+      background: var(--surface-alt);
+      color: var(--text-primary);
+      font-family: inherit;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .social-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .mode-switch {
+      text-align: center;
+      margin-top: 0.85rem;
+      font-size: 0.82rem;
+      color: var(--text-secondary);
+    }
+
+    .mode-switch a {
+      color: var(--accent);
+      font-weight: 700;
+      text-decoration: none;
+      margin-inline-start: 0.25rem;
+    }
+
+    .mode-switch a:hover { text-decoration: underline; }
+
+    .auth-status {
+      display: none;
+      margin-top: 0.75rem;
+      padding: 0.68rem 0.9rem;
+      border-radius: 0.75rem;
+      background: var(--success-soft);
+      border: 1px solid var(--success);
+      color: var(--success);
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+
+    .auth-status.visible { display: block; }
+
+    .panel-note {
+      text-align: center;
+      font-size: 0.76rem;
+      color: var(--text-secondary);
+    }
+
+    @media screen and (max-height: 640px), screen and (max-width: 640px) {
+      body { height: auto; min-height: 100vh; overflow-y: auto; }
+      .auth-panel { padding: 3.75rem 1.25rem 1.5rem; }
+      .auth-card { padding: 1.45rem; }
+      .field-row-2 { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <main class="auth-shell">
+    <section class="auth-panel">
+      <div class="panel-topbar">
+        <div class="panel-utils">
+          <button type="button" class="util-btn" id="themeToggle" aria-label="Toggle dark mode">
+            <i class="fas fa-moon" id="themeIcon"></i>
+          </button>
+          <button type="button" class="util-btn" id="rtlToggle" aria-label="Toggle RTL/LTR">
+            <i class="fas fa-arrow-right-arrow-left"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="auth-card">
+        <a href="index.html" class="brand">Scan<span>Dine</span></a>
+        <h1>Create your account</h1>
+        <p class="auth-subtitle" id="regSubtitle">Save dietary preferences, favorites, and receipts.</p>
+
+        <div class="role-tabs" role="tablist" aria-label="Select account type">
+          <button type="button" class="role-tab active" data-role="user">
+            <i class="fas fa-user"></i> Diner / User
+          </button>
+          <button type="button" class="role-tab" data-role="admin">
+            <i class="fas fa-utensils"></i> Restaurant Admin
+          </button>
+        </div>
+
+        <form class="auth-form" id="registerForm" novalidate>
+          <div class="field-row-2 single-col" id="identityRow">
+            <div class="field" id="nameField">
+              <label for="regName">Full Name</label>
+              <div class="input-wrap">
+                <input type="text" id="regName" placeholder="e.g. Elena Moretti" required>
+              </div>
+              <span class="field-error">Please enter your full name.</span>
+            </div>
+
+            <div class="field is-hidden" id="venueField">
+              <label for="regVenue">Restaurant Name</label>
+              <div class="input-wrap">
+                <input type="text" id="regVenue" placeholder="e.g. Trattoria Sol">
+              </div>
+              <span class="field-error">Enter your restaurant name.</span>
+            </div>
+          </div>
+
+          <div class="field" id="emailField">
+            <label for="regEmail">Email Address</label>
+            <div class="input-wrap">
+              <input type="email" id="regEmail" placeholder="elena@scandine.io" required>
+            </div>
+            <span class="field-error">Please enter a valid email address.</span>
+          </div>
+
+          <div class="field" id="pwdField">
+            <label for="regPwd">Password</label>
+            <div class="input-wrap">
+              <input type="password" id="regPwd" placeholder="Minimum 6 characters" required>
+              <button type="button" class="pwd-toggle" id="togglePwdBtn" aria-label="Show or hide password">
+                <i class="fas fa-eye" id="pwdIcon"></i>
+              </button>
+            </div>
+            <span class="field-error">Password must be at least 6 characters.</span>
+          </div>
+
+          <div class="field" id="termsField">
+            <label class="terms-label">
+              <input type="checkbox" id="regTerms" checked>
+              <span>I agree to ScanDine's Terms &amp; Privacy Policy</span>
+            </label>
+            <span class="field-error">Please accept the terms to continue.</span>
+          </div>
+
+          <button type="submit" class="submit-btn" id="submitRegBtn">Create Account &amp; Open User Dashboard</button>
+        </form>
+
+        <div class="auth-status" id="regStatus" role="status" aria-live="polite"></div>
+
+        <div class="divider">Or sign up with</div>
+
+        <div class="social-row">
+          <button type="button" class="social-btn" data-sso="Google">
+            <i class="fab fa-google"></i> Google
+          </button>
+          <button type="button" class="social-btn" data-sso="Apple">
+            <i class="fab fa-apple"></i> Apple
+          </button>
+        </div>
+
+        <p class="mode-switch">
+          Already have an account?
+          <a href="login.html">Sign in</a>
+        </p>
+      </div>
+
+      <p class="panel-note">&copy; 2026 ScanDine &bull; Contactless QR Menu Platform</p>
+    </section>
+  </main>
+
+  <script>
+    (function() {
+      /* ----- THEME & RTL ----- */
+      const htmlEl = document.documentElement;
+      const themeToggle = document.getElementById('themeToggle');
+      const themeIcon = document.getElementById('themeIcon');
+      const rtlToggle = document.getElementById('rtlToggle');
+
+      function applyTheme(dark) {
+        if (dark) {
+          htmlEl.setAttribute('data-theme', 'dark');
+          themeIcon.classList.replace('fa-moon', 'fa-sun');
+          localStorage.setItem('theme', 'dark');
+        } else {
+          htmlEl.removeAttribute('data-theme');
+          themeIcon.classList.replace('fa-sun', 'fa-moon');
+          localStorage.setItem('theme', 'light');
+        }
+      }
+      if (localStorage.getItem('theme') === 'dark') applyTheme(true);
+      themeToggle.addEventListener('click', () => applyTheme(htmlEl.getAttribute('data-theme') !== 'dark'));
+
+      function applyDir(rtl) {
+        htmlEl.setAttribute('dir', rtl ? 'rtl' : 'ltr');
+        localStorage.setItem('dir', rtl ? 'rtl' : 'ltr');
+      }
+      if (localStorage.getItem('dir') === 'rtl') applyDir(true);
+      rtlToggle.addEventListener('click', () => applyDir(htmlEl.getAttribute('dir') !== 'rtl'));
+
+      /* ----- REGISTER PORTAL SWITCH & VALIDATION ----- */
+      let activeRole = 'user';
+      const regSubtitle = document.getElementById('regSubtitle');
+      const identityRow = document.getElementById('identityRow');
+      const venueField = document.getElementById('venueField');
+      const regName = document.getElementById('regName');
+      const regVenue = document.getElementById('regVenue');
+      const regEmail = document.getElementById('regEmail');
+      const regPwd = document.getElementById('regPwd');
+      const regTerms = document.getElementById('regTerms');
+      const submitRegBtn = document.getElementById('submitRegBtn');
+      const regStatus = document.getElementById('regStatus');
+
+      function syncRoleUi() {
+        const isAdmin = activeRole === 'admin';
+        venueField.classList.toggle('is-hidden', !isAdmin);
+        identityRow.classList.toggle('single-col', !isAdmin);
+        regSubtitle.textContent = isAdmin
+          ? 'Launch your restaurant QR menu and live kitchen board.'
+          : 'Save dietary preferences, favorites, and receipts.';
+        regEmail.placeholder = isAdmin ? 'marco@trattoriasol.com' : 'elena@scandine.io';
+        submitRegBtn.textContent = isAdmin
+          ? 'Create Account & Open Admin Dashboard'
+          : 'Create Account & Open User Dashboard';
+      }
+
+      document.querySelectorAll('.role-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+          document.querySelectorAll('.role-tab').forEach(t => t.classList.remove('active'));
+          tab.classList.add('active');
+          activeRole = tab.dataset.role;
+          regStatus.classList.remove('visible');
+          syncRoleUi();
+        });
+      });
+
+      document.getElementById('togglePwdBtn').addEventListener('click', () => {
+        const show = regPwd.type === 'password';
+        regPwd.type = show ? 'text' : 'password';
+        document.getElementById('pwdIcon').classList.toggle('fa-eye', !show);
+        document.getElementById('pwdIcon').classList.toggle('fa-eye-slash', show);
+      });
+
+      function redirectToDashboard() {
+        const target = activeRole === 'admin' ? 'admin-dashboard.html' : 'user-dashboard.html';
+        regStatus.classList.add('visible');
+        regStatus.textContent = 'Account created! Opening ' + (activeRole === 'admin' ? 'Admin' : 'User') + ' Dashboard...';
+        setTimeout(() => { window.location.href = target; }, 750);
+      }
+
+      document.getElementById('registerForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const nameField = document.getElementById('nameField');
+        const emailField = document.getElementById('emailField');
+        const pwdField = document.getElementById('pwdField');
+        const termsField = document.getElementById('termsField');
+        let valid = true;
+
+        if (!regName.value.trim()) { nameField.classList.add('has-error'); valid = false; } else { nameField.classList.remove('has-error'); }
+        if (activeRole === 'admin' && !regVenue.value.trim()) { venueField.classList.add('has-error'); valid = false; } else { venueField.classList.remove('has-error'); }
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(regEmail.value.trim())) { emailField.classList.add('has-error'); valid = false; } else { emailField.classList.remove('has-error'); }
+        if (regPwd.value.length < 6) { pwdField.classList.add('has-error'); valid = false; } else { pwdField.classList.remove('has-error'); }
+        if (!regTerms.checked) { termsField.classList.add('has-error'); valid = false; } else { termsField.classList.remove('has-error'); }
+
+        if (!valid) return;
+        redirectToDashboard();
+      });
+
+      document.querySelectorAll('.social-btn').forEach(btn => {
+        btn.addEventListener('click', redirectToDashboard);
+      });
+
+      syncRoleUi();
+    })();
+  </script>
+</body>
+</html>
